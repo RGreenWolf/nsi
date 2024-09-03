@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Map</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: black;
+        }
+        #container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        form, iframe {
+            border-radius: 10px;
+        }
+        form {
+            max-width: 400px;
+            padding: 20px;
+            background-color: gray;
+        }
+        input[type="text"], select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border-radius: 10px;
+        }
+        button {
+            background-color: #ff9100;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e68100;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        iframe {
+            width: 50%;
+            height: 500px;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <form id="mapForm">
+            <h2>Generate Map</h2>
+            <label for="transportType">Type de transport:</label>
+            <select id="transportType" name="transportType">
+                <option value="car">Voiture</option>
+                <option value="foot">À pied</option>
+            </select>
+            <label for="departLat">Départ Latitude:</label>
+            <input type="text" id="departLat" name="departLat" value="50.9785373" required>
+            <label for="departLon">Départ Longitude:</label>
+            <input type="text" id="departLon" name="departLon" value="2.3557651" required>
+            <label for="arriveeLat">Arrivée Latitude:</label>
+            <input type="text" id="arriveeLat" name="arriveeLat" value="50.9765844" required>
+            <label for="arriveeLon">Arrivée Longitude:</label>
+            <input type="text" id="arriveeLon" name="arriveeLon" value="2.3431284" required>
+            <button type="submit">Generate Map</button>
+        </form>
+        <div class="result" id="result"></div>
+        <iframe id="mapIframe" style="display:none;"></iframe>
+    </div>
+
+    <script>
+        document.getElementById('mapForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const transportType = document.getElementById('transportType').value;
+            const departLat = document.getElementById('departLat').value;
+            const departLon = document.getElementById('departLon').value;
+            const arriveeLat = document.getElementById('arriveeLat').value;
+            const arriveeLon = document.getElementById('arriveeLon').value;
+
+            const data = {
+                transport: transportType,
+                loc: {
+                    depart: {
+                        lat: parseFloat(departLat),
+                        lon: parseFloat(departLon)
+                    },
+                    arrivee: {
+                        lat: parseFloat(arriveeLat),
+                        lon: parseFloat(arriveeLon)
+                    }
+                }
+            };
+
+            fetch('/generate_map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const mapIframe = document.getElementById('mapIframe');
+                    mapIframe.style.display = 'block';
+                    mapIframe.src = result.url;
+                } else {
+                    document.getElementById('result').textContent = 'Erreur: ' + result.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = `Erreur lors de la génération de la carte ! ${error}`;
+            });
+        });
+    </script>
+</body>
+</html>
