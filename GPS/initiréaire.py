@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 import uuid
-from pyroutelib3 import Router
+from pyroutelib3 import router
 import folium
 import os
 
@@ -22,15 +22,15 @@ def generate_map():
     arrivee_lat = loc_arrivee["lat"]
     arrivee_lon = loc_arrivee["lon"]
 
-    router = Router(transport_mode)
+    route = router(transport_mode)
 
-    depart = router.findNode(depart_lat, depart_lon)
-    arrivee = router.findNode(arrivee_lat, arrivee_lon)
+    depart = route.findNode(depart_lat, depart_lon)
+    arrivee = route.findNode(arrivee_lat, arrivee_lon)
 
-    status, route = router.doRoute(depart, arrivee)
+    status, chemin = route.doRoute(depart, arrivee)
 
     if status == 'success':
-        routeLatLons = list(map(router.nodeLatLon, route))
+        routeLatLons = list(map(router.nodeLatLon, chemin))
 
         map_center = [(depart_lat + arrivee_lat) / 2, (depart_lon + arrivee_lon) / 2]
         c = folium.Map(location=map_center, zoom_start=15)
@@ -52,10 +52,6 @@ def generate_map():
 @app.route('/maps/<filename>')
 def get_map(filename):
     return send_from_directory('maps', filename + '.html')
-
-@app.route('/tp2')
-def tp2():
-    return send_from_directory('', 'tp2.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

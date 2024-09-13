@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning Scolaire</title>
+    <style>
+        html {
+            background-color: #464646;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 2px;
+            text-align: center;
+        }
+        th {
+            background-color: #242424;
+        }
+        .matiere {
+            padding: 1rem;
+            transition: 0.5s;
+        }
+        .matiere:hover {
+            cursor: pointer;
+        }
+        button {
+            border-radius: 5px;
+            background-color: blue;
+            color: white;
+            padding: 5px;
+            margin: 2px;
+        }
+        .maths { background-color: #ff6600; }
+        .pc { background-color: #00c7ce; }
+        .anglais { background-color: #daff07; }
+        .fr { background-color: #0eff0e; }
+        .espagnol { background-color: #ababab; }
+        .ens { background-color: #00af2c; }
+        .nsi { background-color: #ff0000; }
+        .hg { background-color: #2036ff; }
+        .sport { background-color: #80a4ff; }
+        .emc { background-color: #ff25b3; }
+        .ds { background-color: #ff2f00; }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h1>Planning Scolaire</h1>
+        <h2>Classe de 1GEN / Année scolaire 2024-2025 / Semaine Civil : 
+            <span id="week"></span>
+            <button id="changeWeekBtn">change</button>
+        </h2>
+    </div>
+    <table>
+        <thead>
+            <tr class="titre">
+                <th>Heure</th>
+                <th>Lundi</th>
+                <th>Mardi</th>
+                <th>Mercredi</th>
+                <th>Jeudi</th>
+                <th>Vendredi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>08h00 - 08h55</td>
+                <td rowspan="2" class="nsi matiere">NUMERIQUE SC.INFORM.<br>JOUIN A.</td>
+                <td id="changeWeek" class="emc matiere"></td>
+                <td></td>
+                <td rowspan="2" class="ds matiere">DEVOIR SURVEILLÉ</td>
+                <td class="fr matiere">FRANÇAIS<br>VANDERBEKEN B.</td>
+            </tr>
+            <tr>
+                <td>09h00 - 10h05</td>
+                <td class="maths matiere">MATHEMATIQUES<br>BUNIET A.</td>
+                <td class="pc matiere">PHYSIQUE-CHIMIE<br>DOOM G.</td>
+                <td class="hg matiere">HISTOIRE-GEOGRAPHIE<br>GUELOU L.</td>
+            </tr>
+            <tr>
+                <td>10h05 - 11h00</td>
+                <td class="hg matiere">HISTOIRE-GEOGRAPHIE<br>GUELOU L.</td>
+                <td class="nsi matiere">NUMERIQUE SC.INFORM.<br>JOUIN A.</td>
+                <td class="hg matiere">HISTOIRE-GEOGRAPHIE<br>GUELOU L.</td>
+                <td class="maths matiere">MATHEMATIQUES<br>BUNIET A.</td>
+                <td rowspan="2" class="sport matiere">ED.PHYSIQUE & SPORT.<br>DELAMOTTE F.</td>
+            </tr>
+            <tr>
+                <td>11h00 - 11h55</td>
+                <td class="fr matiere">FRANÇAIS<br>VANDERBEKEN B.</td>
+                <td class="espagnol matiere">ESPAGNOL LV2<br>DENIS S.</td>
+                <td class="fr matiere">FRANÇAIS<br>VANDERBEKEN B.</td>
+                <td class="ens matiere">ENSEIGN. SCIENTIFIQUE<br>DOOM G.</td>
+            </tr>
+            <tr>
+                <td>11h55 - 12h55</td>
+                <td colspan="5">MANGER</td>
+            </tr>
+            <tr>
+                <td>12h55 - 13h50</td>
+                <td></td>
+                <td></td>
+                <td rowspan="5"></td>
+                <td class="anglais matiere">ANGLAIS<br>DEHEUNYNCK F.</td>
+                <td class="nsi matiere">NUMERIQUE SC.INFORM.<br>JOUIN A.</td>
+            </tr>
+            <tr>
+                <td>13h50 - 14h45</td>
+                <td class="maths matiere">MATHEMATIQUES<br>BUNIET A.</td>
+                <td class="fr matiere">FRANÇAIS<br>VANDERBEKEN B.</td>
+                <td rowspan="2" class="pc matiere">PHYSIQUE-CHIMIE<br>DOOM G.</td>
+                <td class="maths matiere">MATHEMATIQUES<br>BUNIET A.</td>
+            </tr>
+            <tr>
+                <td>14h45 - 15h40</td>
+                <td rowspan="3"></td>
+                <td rowspan="3"></td>
+                <td class="anglais matiere">ANGLAIS<br>DEHEUNYNCK F.</td>
+            </tr>
+            <tr>
+                <td>15h55 - 16h50</td>
+                <td rowspan="2"></td>
+                <td class="espagnol matiere">ESPAGNOL LV2<br>DENIS S.</td>
+            </tr>
+            <tr>
+                <td>16h50 - 17h45</td>
+                <td class="pc matiere">PHYSIQUE-CHIMIE<br>DOOM G.</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+<script>
+function getWeekNumber(date) {
+  const currentDate = new Date()
+  const startDate = new Date(currentDate.getFullYear(), 0, 1);
+  const days = Math.floor((currentDate - startDate) / (24 * 60 * 60 * 1000));
+  const weekNumber = Math.ceil((days + startDate.getDay() + 1) / 7);
+  return weekNumber;
+}
+
+const weekNumber = getWeekNumber()
+
+let weekPair = weekNumber % 2 === 0;
+
+document.getElementById('week').innerText = `${weekNumber} (${weekPair ? 'Paire' : 'Impaire'})`;
+
+
+const changeWeek = document.getElementById('changeWeek');
+const changeWeekBTN = document.getElementById('changeWeekBtn');
+
+changeWeekBTN.addEventListener("click", () => {
+    weekPair = !weekPair;
+    update()
+})
+
+function update(){
+    if(weekPair){
+        changeWeek.innerHTML = "ANGLAIS<br>DEHEUNYNCK F."
+        changeWeek.classList.remove("emc")
+        changeWeek.classList.add("anglais")
+    } else {
+        changeWeek.innerHTML = "ENS. MORAL & CIVIQUE<br>GUELOU L."
+        changeWeek.classList.remove("anglais")
+        changeWeek.classList.add("emc")
+    }
+}
+
+update()
+</script>
