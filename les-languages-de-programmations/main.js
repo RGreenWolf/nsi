@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
         {
             text: 'Les langages modernes',
             href: '/themes/modernes/'
-        },        {
+        },
+        {
             text: 'Les différents types de langages',
             href: '/themes/les-types/'
         }
