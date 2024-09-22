@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>L'histoire Les Language de programmations</title>
+        <link rel="icon" href="/assets/logo.jpeg">
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://cdn.tailwindcss.com/"></script>
+        <script src="/main.js"></script>
+    </head>
+    <body>
+        <header>
+            <div class="flex items-center">
+                <div class="flex-1 justify-start mr-3">
+                    <img src="/assets/logo.jpeg" alt="Logo" class="logo zoom-off">
+                </div>
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <h1 class="text-3xl font-black text-white p-2">
+                        L'histoire Les Language de programmations
+                    </h1>
+                    <nav class="flex gap-2 p-2">
+                        <a class="nav-btn" href="/">
+                            Accueil
+                        </a>
+                        <div class="relative">
+                            <button class="nav-dropdown-btn-main" id="dropdown-button">
+                                Thèmes
+                            </button>
+                            <div class="nav-dropdown hidden" id="dropdown-menu"></div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="flex-1"></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="card p-4">
+                <h2 class="text-2xl font-bold mb-4">Les langages de programmation de 1960 à 1990</h2>
+                
+                <p class="text-white mb-2">
+                    Suite à l'ALGOL 58, une version plus stable a été créée : l'ALGOL 60. 
+                    Il a introduit la récursivité, les variables locales et les blocs structurés. 
+                    L'ALGOL 60 a posé les bases de la programmation structurée.
+                </p>
+                <p class="text-white mb-2">
+                    Le langage C est sorti dans les années 1970. C'est un langage compilé de bas niveau, 
+                    encore très utilisé aujourd'hui. Il permet de faire beaucoup de choses, notamment grâce 
+                    à sa gestion fine de la mémoire. Il a été créé à l'origine pour réécrire Unix, mais de 
+                    nos jours, il sert à bien plus, comme le développement de systèmes d'exploitation.
+                </p>
+                <p class="text-white mb-2">
+                    Suite à l'ALGOL 60, parmi ses héritiers, est né un langage connu pour être un des premier 
+                    langage orienté objet : Simula 67. Ce langage a repris les bases posées par l'ALGOL 60, 
+                    puis y a ajouté la notion d'objet, entre autres innovations. Cela a complètement transformé 
+                    la programmation moderne.
+                </p>
+                <img src="/assets/example/simula.png" alt="Hello World ! Simula 67" class="example-img">
+                <p class="text-white mb-2">
+                    Un autre héritier de l'ALGOL 60, arrivé après Simula 67, est le langage Pascal. 
+                    En s'inspirant de la rigueur et de la clarté de l'ALGOL 60, Pascal est un langage 
+                    typé avec une syntaxe très structurée. Il a été très utilisé pour l'apprentissage des 
+                    concepts fondamentaux de la programmation.
+                </p>
+                <p class="text-white mb-2">
+                    Le SQL, sorti en 1974, suit l'article <i>A Relational Model of Data for Large Shared 
+                    Data Banks</i> publié en 1970. Cet article présente un modèle théorique de base de données, 
+                    les bases de données relationnelles, qui est apparu comme particulièrement intéressant.
+                </p>
+            </div>
+        </main>
+
+        <footer>
+            <p class="text-white">
+                RGreenWolf | Théophile &copy; 2024 - L'Histoire des Languages de programmations
+            </p>
+        </footer>
+    </body>
+</html>

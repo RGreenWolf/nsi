@@ -1,26 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const buttons = [
+        {
+            text: 'Conclusion',
+            href: '/conclusion/'
+        }
+    ]
     const dropdownButtons = [
         {
             text: 'Le début des Languages',
             href: '/themes/le-debut/'
         },
         {
-            text: "dans les années 1960 à 1990",
+            text: "Dans les années 1960 à 1990",
             href: "/themes/1960-1990/"
-        },
-        {
-            text: 'Les différents types de langages',
-            href: '/themes/les-types/'
-        },
-        {
-            text: 'Le web',
-            href: '/themes/le-web/'
         },
         {
             text: 'Les langages modernes',
             href: '/themes/modernes/'
+        },        {
+            text: 'Les différents types de langages',
+            href: '/themes/les-types/'
         }
     ]
+
+
+    buttons.forEach((button, index) => {
+        const a = document.createElement('a');
+        a.classList.add("nav-btn");
+        a.href = button.href;
+        a.textContent = button.text;
+        document.querySelector('nav').appendChild(a);
+    })
 
     dropdownButtons.forEach((button, index) => {
         const a = document.createElement('a');
@@ -85,4 +95,10 @@ document.addEventListener("DOMContentLoaded", function () {
     logo.addEventListener('click', () => {
         window.location.href = '/';
     });
+
+    const analytics = document.createElement('script');
+    analytics.defer = true;
+    analytics.src = 'https://analytics.younity-mc.fr/script.js';
+    analytics.dataset.websiteId = '485ef027-3637-4f09-b41e-c5b13805b004';
+    document.head.appendChild(analytics);
 });
