@@ -4,39 +4,75 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>L'histoire Les Language de programmations</title>
-        <link rel="stylesheet" href="./style.css">
+        <link rel="icon" href="/assets/logo.jpeg">
+        <link rel="stylesheet" href="/style.css">
         <script src="https://cdn.tailwindcss.com/"></script>
-        <script src="./main.js"></script>
+        <script src="/main.js"></script>
     </head>
-    <body class="bg-slate-800 flex flex-col items-center justify-center">
-        <header class="mx-2 mt-2 flex flex-col justify-center items-center bg-gradient-to-r from-blue-700 to-slate-950 rounded-xl w-[98%] ring-2 ring-blue-600 text-center">
-            <h1 class="text-3xl font-black text-white p-2">
-                L'histoire Les Language de programmations
-            </h1>
-            <nav class="flex gap-2 p-2">
-                <a class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:ring-2 ring-teal-500" href="/">
-                    Accueil
-                </a>
-                <div class="relative">
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded" id="dropdown-button">
-                        Thèmes
-                    </button>
-                    <div class="absolute hidden bg-blue-700 ring-2 ring-blue-500 shadow-lg mt-2 rounded w-48" id="dropdown-menu">
-                        <a href="/themes/le-web/" class="block px-4 py-2 text-white font-medium hover:bg-blue-500 hover:text-white">
-                        Le web
+    <body>
+        <header>
+            <div class="flex items-center">
+                <div class="flex-1 justify-start mr-3">
+                    <img src="/assets/logo.jpeg" alt="Logo" class="logo zoom-off">
+                </div>
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <h1 class="text-3xl font-black text-white p-2">
+                        L'histoire Les Language de programmations
+                    </h1>
+                    <nav class="flex gap-2 p-2">
+                        <a class="nav-btn" href="/">
+                            Accueil
+                        </a>
+                        <div class="relative">
+                            <button class="nav-dropdown-btn-main" id="dropdown-button">
+                                Thèmes
+                            </button>
+                            <div class="nav-dropdown hidden" id="dropdown-menu"></div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="flex-1"></div>
+            </div>
+        </header>
+
+        <main>
+            <section class="card py-8">
+                <div class="section-container">
+                    <div class="section-image">
+                        <img src="/assets/img/hero-section.png" alt="Hero" class="rounded-lg shadow-lg zoom-off">
+                    </div>
+                    
+                    <div class="section-content">
+                        <h1 class="text-4xl font-bold mb-4 text-gray-300">
+                            Explorez l'histoire des langages de programmation
+                        </h1>
+                        <p class="text-lg mb-6 text-gray-400">
+                            Découvrez comment les langages de programmation ont évolué au fil du temps pour façonner le monde numérique d'aujourd'hui.
+                        </p>
+
+                        <a href="#introduction" class="btn-primary">
+                            Voir l'introduction
                         </a>
                     </div>
                 </div>
-            </nav>
-        </header>
-
-        <main class="w-[95%] mt-4 p-4 bg-slate-900 text-gray-200 rounded ring-2 ring-blue-600">
-            <p>Contenu principal ici</p>
+            </section>
+            <div id="introduction" class="card">
+                <h2 class="text-3xl font-bold text-gray-300 mb-4">
+                    Introduction
+                </h2>
+                <p class="text-lg text-gray-400 mb-2">
+                    Les langages de programmation sont des outils essentiels pour les développeurs de logiciels. Ils permettent de communiquer avec les ordinateurs et de leur donner des instructions pour exécuter des tâches spécifiques. Les langages de programmation ont évolué au fil du temps pour devenir de plus en plus puissants et flexibles. Ils ont également contribué à façonner le monde numérique d'aujourd'hui en permettant la création de logiciels, de sites web, d'applications mobiles, etc...
+                </p>
+                <a href="./themes/le-debut" class="btn-primary">
+                    Découvrir le début des langages de programmation
+                </a>
+            </div>
         </main>
         
-        <footer class="fixed bottom-1 bg-slate-950 p-2 rounded">
+
+        <footer>
             <p class="text-white">
-                RGreenWolf | Théophile &copy; 2024 - Les Language de programmations
+                RGreenWolf | Théophile &copy; 2024 - L'Histoire des Languages de programmations
             </p>
         </footer>
     </body>

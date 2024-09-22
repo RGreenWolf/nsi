@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>L'histoire Les Language de programmations</title>
+        <link rel="icon" href="/assets/logo.jpeg">
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://cdn.tailwindcss.com/"></script>
+        <script src="/main.js"></script>
+    </head>
+    <body>
+        <header>
+            <div class="flex items-center">
+                <div class="flex-1 justify-start mr-3">
+                    <img src="/assets/logo.jpeg" alt="Logo" class="logo zoom-off">
+                </div>
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <h1 class="text-3xl font-black text-white p-2">
+                        L'histoire Les Language de programmations
+                    </h1>
+                    <nav class="flex gap-2 p-2">
+                        <a class="nav-btn" href="/">
+                            Accueil
+                        </a>
+                        <div class="relative">
+                            <button class="nav-dropdown-btn-main" id="dropdown-button">
+                                Thèmes
+                            </button>
+                            <div class="nav-dropdown hidden" id="dropdown-menu"></div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="flex-1"></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="card p-4">
+                <h2 class="text-2xl font-bold mb-4">Les Différents Types de Langages de Programmation</h2>
+                <p class="text-white">Il existe de nombreux langues de programmations qui peu être trier par type de fonctionnement :</p>
+                <ul class="text-white mb-2 list-disc pl-5">
+                    <li>
+                        <strong>Langages Compilés</strong> (C, C++)
+                        <br><em>Les langages compilés transforment le code source en code machine, avant d'être excuter.</em>
+                    </li>
+                    <li>
+                        <strong>Langages Interprétés</strong> (Python)
+                        <br><em>Les langages interprétés exécutent le code ligne par ligne.</em>
+                    </li>
+                    <li>
+                        <strong>Langages Mixtes</strong> (Java).
+                        <br><em>Les langages mixtes combinent les deux approches.</em>
+                    </li>
+                    <hr class="my-2">
+                    <li>
+                        <strong>Langages Orientés Objet :</strong> (Java) <br>Basés sur le concept d'objets.
+                        <br><em>Ces langages organisent le code en objets qui contiennent des données et des méthodes, facilitant la réutilisation et la modularité.</em>
+                    </li>
+                    <hr class="my-2">
+                    <li>
+                        <strong>Langages de bas niveau :</strong> (assembleur) <br>Proches du matériel
+                        <br><em>Ils permettent un contrôle direct du matériel et sont souvent utilisés pour des applications nécessitant une performance maximale.</em>
+                    </li>
+                    <li>
+                        <strong>Langages de haut niveau :</strong> (Python) <br>Plus abstraits et faciles à utiliser
+                        <br><em>Ils offrent une syntaxe plus proche du langage humain, ce qui facilite le développement et la compréhension du code.</em>
+                    </li>
+                </ul>
+            </div>
+            
+        </main>
+        
+
+        <footer>
+            <p class="text-white">
+                RGreenWolf | Théophile &copy; 2024 - L'Histoire des Languages de programmations
+            </p>
+        </footer>
+    </body>
+</html>

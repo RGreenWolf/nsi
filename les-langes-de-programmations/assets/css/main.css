@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-slate-800 flex flex-col items-center justify-center;
+}
+
+header {
+    @apply mx-2 mt-2 items-center bg-gradient-to-r from-blue-700 to-slate-950 rounded-xl w-[98%] ring-2 ring-blue-600;
+}
+
+main {
+    @apply w-[95%] mt-2 mb-12 space-y-5;
+}
+
+footer {
+    @apply fixed bottom-1 bg-slate-950 p-2 rounded;
+}
+
+img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.logo {
+    @apply h-auto w-28 rounded-full ml-4;
+}
+
+.nav-btn {
+    @apply bg-blue-500 text-white font-bold py-2 px-4 rounded hover:ring-2 ring-teal-500;
+}
+
+.nav-dropdown {
+    @apply absolute bg-blue-700 ring-2 ring-blue-500 shadow-lg mt-2 rounded w-48;
+}
+
+.nav-dropdown-btn-main {
+    @apply bg-blue-500 text-white px-4 py-2 rounded;
+}
+
+.nav-dropdown-btn-menu {
+    @apply block px-4 py-2 text-white font-medium hover:bg-blue-500 hover:text-white;
+}
+
+.card {
+    @apply mt-4 p-4 bg-slate-900 text-gray-200 rounded ring-2 ring-blue-600 shadow-lg shadow-blue-600;
+}
+
+.btn-primary {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg;
+}
+
+.section-container {
+    @apply container mx-auto flex flex-col md:flex-row items-center;
+}
+
+.section-image {
+    @apply md:w-1/2 w-full mb-8 md:mb-0;
+}
+
+.section-content {
+    @apply md:w-1/2 w-full md:pl-12 text-center md:text-left;
+}
+
+.example-img {
+    @apply w-64 h-auto rounded-md;
+}
+
+.zoom-off {}
+
+.image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.zoomed-image {
+    max-width: 80%;
+    max-height: 80%;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.image-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}

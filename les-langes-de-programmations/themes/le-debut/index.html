@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>L'histoire Les Language de programmations</title>
+        <link rel="icon" href="/assets/logo.jpeg">
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://cdn.tailwindcss.com/"></script>
+        <script src="/main.js"></script>
+    </head>
+    <body>
+        <header>
+            <div class="flex items-center">
+                <div class="flex-1 justify-start mr-3">
+                    <img src="/assets/logo.jpeg" alt="Logo" class="logo zoom-off">
+                </div>
+                <div class="flex-1 flex flex-col items-center text-center">
+                    <h1 class="text-3xl font-black text-white p-2">
+                        L'histoire Les Language de programmations
+                    </h1>
+                    <nav class="flex gap-2 p-2">
+                        <a class="nav-btn" href="/">
+                            Accueil
+                        </a>
+                        <div class="relative">
+                            <button class="nav-dropdown-btn-main" id="dropdown-button">
+                                Thèmes
+                            </button>
+                            <div class="nav-dropdown hidden" id="dropdown-menu"></div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="flex-1"></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="card p-4">
+                <h2 class="text-2xl font-bold mb-4">Le début des Langages de Programmation</h2>
+                <p class="text-white mb-2">
+                    L'histoire des langages de programmation débute avec le système binaire, qui est le fondement de toutes les opérations informatiques. 
+                    Ce système utilise seulement deux symboles, 0 et 1, pour représenter toutes les données. À ce stade, la programmation se faisait 
+                    directement à l'aide de codes machine, ce qui était extrêmement complexe et peu intuitif.
+                </p>
+                <p class="text-white mb-2">
+                    Dans les années 1940, les premiers langages d'assemblage ont été développés. Ces langages permettent de donner des instructions 
+                    à la machine en utilisant des mnémotechniques, rendant la programmation légèrement plus accessible. Cependant, les langages 
+                    d'assemblage nécessitaient toujours une connaissance approfondie de l'architecture de l'ordinateur.
+                </p>
+                <img src="/assets/example/assembleur.png" alt="Langage d'assemblage" class="example-img">
+                <p class="text-white mb-2">
+                    Dans les années 1950, la révolution des langages de haut niveau a commencé. FORTRAN (Formula Translation), conçu pour 
+                    le calcul scientifique, et COBOL (Common Business-Oriented Language), destiné aux applications commerciales, sont parmi les 
+                    premiers langages à faciliter le développement de logiciels. Ces langages ont introduit des concepts comme les boucles, 
+                    les conditions et les structures de données, permettant aux programmeurs de se concentrer sur la logique plutôt que sur 
+                    les détails matériels. 
+                    Parallèlement, des travaux ont été réalisés sur ALGOL (Algorithmic Language), qui a été initialement présenté en 1958. 
+                    Bien qu'ALGOL 58 ou IAL (International Algebraic Language) n'ait pas encore pleinement formalisé des concepts tels que la récursivité et les variables locales, 
+                    il a établi une base pour le développement futur des langages de programmation. C'est principalement à partir de sa version 
+                    ultérieure, ALGOL 60, que ces innovations ont été pleinement intégrées.
+                </p>
+                <img src="/assets/example/fortran.png" alt="FORTRAN" class="example-img">
+                <p class="text-white mb-2">
+                    Avec l'avènement de ces langages de haut niveau, la programmation est devenue plus accessible, permettant à un plus grand 
+                    nombre de personnes de participer à l'écriture de logiciels. Cela a ouvert la voie à des avancées technologiques 
+                    majeures dans les décennies suivantes, posant les bases de l'informatique moderne.
+                </p>
+            </div>
+        </main>
+        
+
+        <footer>
+            <p class="text-white">
+                RGreenWolf | Théophile &copy; 2024 - L'Histoire des Languages de programmations
+            </p>
+        </footer>
+    </body>
+</html>
