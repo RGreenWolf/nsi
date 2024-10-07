@@ -5,10 +5,10 @@ import os
 import sys
 
 baseURL = "http://localhost:5000"  # URL du serveur
-# baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"  # Pour un usage distant
+baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 
-token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'  # Fichier de sauvegarde du token local
-username = None  # Variable pour stocker le nom d'utilisateur localement
+token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
+username = None
 
 # Fonction pour charger le token depuis le fichier
 def load_token():
@@ -43,7 +43,7 @@ def login():
     if res.json().get("status") == "success":
         print("Connexion réussie !")
         token = res.json().get("token")
-        save_token(token, username)  # Enregistrer le token dans le fichier
+        save_token(token, username)
         return token
     else:
         print(f"Erreur lors de la connexion : {res.json().get('message')}")
@@ -102,13 +102,13 @@ def startGame(token, username, party):
 
 # Fonction principale
 def main():
-    save = load_token()  # Charger le token sauvegardé
+    save = load_token()
     token = save.get('token') if save else None
     username = save.get('username') if save else None
     party = {}
 
     while True:
-        if not token:  # Si aucun token, proposer inscription ou connexion
+        if not token:
             choice = input("Voulez-vous vous inscrire (r) ou vous connecter (l) ? ").lower()
             if choice == "r":
                 token = register()
