@@ -4,7 +4,7 @@ import json
 import os
 import sys
 
-baseURL = "http://localhost:5000"  # URL du serveur
+# baseURL = "http://localhost:5000"
 baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 
 token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
