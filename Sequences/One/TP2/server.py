@@ -1,7 +1,28 @@
 from flask import Flask, request, jsonify
 import uuid
 import random
+import json
+import os
+import hashlib
+import secrets
 
+app = Flask(__name__)
+
+# Charger ou initialiser les utilisateurs et les classements depuis les fichiers JSON
+def load_data(file_name):
+    if os.path.exists(file_name):
+        with open(file_name, 'r') as file:
+            return json.load(file)
+    return {}
+
+def save_data(file_name, data):
+    with open(file_name, 'w') as file:
+        json.dump(data, file, indent=4)
+
+users = load_data('users.json')
+tokens = {}  # Dictionnaire pour stocker les tokens (token -> username)
+
+# Classe de partie
 class Party:
     def __init__(self, player, difficulty):
         self.id = str(uuid.uuid4()).split("-")[0]
@@ -26,18 +47,74 @@ class Party:
 
 parties = []
 
-app = Flask(__name__)
+# Fonction de hachage du mot de passe
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+# Fonction utilitaire pour obtenir le nom d'utilisateur à partir d'un token
+def get_username_from_token(token):
+    return tokens.get(token)
+
+# Vérifier si un joueur est déjà dans une partie active
+def is_player_in_game(player):
+    for party in parties:
+        if player in party.players and party.status != "end":
+            return True
+    return False
+
+# Route pour l'inscription d'un utilisateur
+@app.route('/user/register', methods=['POST'])
+def register():
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Données invalides"}), 400
+    
+    if username in users:
+        return jsonify({"status": "error", "message": "L'utilisateur existe déjà"}), 400
+
+    users[username] = {"password": hash_password(password), "wins": 0}
+    save_data('users.json', users)
+    return jsonify({"status": "success", "message": "Utilisateur enregistré avec succès"})
+
+# Route pour la connexion d'un utilisateur
+@app.route('/user/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Données invalides"}), 400
+    
+    user = users.get(username)
+    if not user or user["password"] != hash_password(password):
+        return jsonify({"status": "error", "message": "Identifiant ou mot de passe incorrect"}), 403
+
+    # Générer un token unique pour cet utilisateur
+    token = secrets.token_hex(16)
+    tokens[token] = username  # Associer le token au nom d'utilisateur
+
+    return jsonify({"status": "success", "message": "Connexion réussie", "token": token})
 
 # Route pour créer une partie
 @app.route('/party/create', methods=['POST'])
 def party_create():
     data = request.json
-    player = data.get("player")
+    token = data.get("token")
     difficulty = data.get("difficulty")
-    
-    if not player or not difficulty:
+
+    # Obtenir le nom d'utilisateur à partir du token
+    player = get_username_from_token(token)
+    if not player or not difficulty or player not in users:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
-    
+
+    # Vérifier si le joueur est déjà dans une partie en cours
+    if is_player_in_game(player):
+        return jsonify({"status": "error", "message": "Vous êtes déjà dans une partie active"}), 400
+
     new_party = Party(player, difficulty)
     parties.append(new_party)
     return jsonify({"status": "success", "id": new_party.id})
@@ -47,10 +124,16 @@ def party_create():
 def party_join():
     data = request.json
     party_id = data.get("id")
-    player = data.get("player")
+    token = data.get("token")
 
-    if not party_id or not player:
+    # Obtenir le nom d'utilisateur à partir du token
+    player = get_username_from_token(token)
+    if not party_id or not player or player not in users:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
+
+    # Vérifier si le joueur est déjà dans une partie en cours
+    if is_player_in_game(player):
+        return jsonify({"status": "error", "message": "Vous êtes déjà dans une partie active"}), 400
 
     for party in parties:
         if party.id == party_id:
@@ -89,9 +172,11 @@ def party_status():
 def party_test():
     data = request.json
     party_id = data.get("id")
-    player = data.get("player")
+    token = data.get("token")
     num = data.get("num")
 
+    # Obtenir le nom d'utilisateur à partir du token
+    player = get_username_from_token(token)
     if not party_id or not player or num is None:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
@@ -102,6 +187,8 @@ def party_test():
             if party.num == num:
                 party.status = "end"
                 parties.remove(party)
+                users[player]["wins"] += 1
+                save_data('users.json', users)
                 return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})
             elif party.num < num:
                 party.switch_turn()
@@ -111,6 +198,25 @@ def party_test():
                 return jsonify({"status": "start", "message": "Trop petit"})
     
     return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
+
+# Route pour obtenir le classement
+@app.route('/rankings', methods=['GET'])
+def get_rankings():
+    token = request.args.get("token")
+    player = get_username_from_token(token)
+
+    if not player:
+        return jsonify({"status": "error", "message": "Token invalide"}), 400
+
+    sorted_users = sorted(users.items(), key=lambda x: x[1]["wins"], reverse=True)
+    # Limiter à 20 utilisateurs dans le classement
+    top_20 = sorted_users[:20]
+    player_rank = next((i+1 for i, user in enumerate(sorted_users) if user[0] == player), None)
+
+    return jsonify({
+        "rankings": [{user[0]: user[1]["wins"]} for user in top_20],
+        "your_rank": player_rank
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
