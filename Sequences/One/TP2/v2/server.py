@@ -96,6 +96,17 @@ def login():
     save_data('tokens.json', tokens)
     return jsonify({"status": "success", "message": "Connexion réussie", "token": token})
 
+@app.route('/auth/check_token', methods=['GET'])
+def check_token():
+    token = request.args.get("token")
+    if not token:
+        return jsonify({"status": "error", "message": "Token manquant"}), 400
+    
+    if token in tokens:
+        return jsonify({"status": "success", "message": "Token valide"})
+    else:
+        return jsonify({"status": "error", "message": "Token invalide"}), 403
+
 # Route pour créer une partie
 @app.route('/party/create', methods=['POST'])
 def party_create():
