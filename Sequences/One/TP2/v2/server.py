@@ -4,23 +4,25 @@ import random
 import json
 import os
 import hashlib
-import secrets
 
 app = Flask(__name__)
 
 # Charger ou initialiser les utilisateurs et les classements depuis les fichiers JSON
-def load_data(file_name):
+def load_data(file_name): 
+    file_name = "data/" + file_name
     if os.path.exists(file_name):
         with open(file_name, 'r') as file:
             return json.load(file)
     return {}
 
 def save_data(file_name, data):
+    file_name = "data/" + file_name
     with open(file_name, 'w') as file:
         json.dump(data, file, indent=4)
 
 users = load_data('users.json')
-tokens = {}  # Dictionnaire pour stocker les tokens (token -> username)
+tokens = load_data('tokens.json')
+parties = {}
 
 # Classe de partie
 class Party:
@@ -45,29 +47,25 @@ class Party:
         if len(self.players) == 2:
             self.current_player = self.players[1] if self.current_player == self.players[0] else self.players[0]
 
-parties = []
-
 # Fonction de hachage du mot de passe
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 # Fonction utilitaire pour obtenir le nom d'utilisateur à partir d'un token
-def get_username_from_token(token):
-    return tokens.get(token)
+def getUsername(token):
+    return tokens[token]
 
 # Vérifier si un joueur est déjà dans une partie active
-def is_player_in_game(player):
-    for party in parties:
-        if player in party.players and party.status != "end":
-            return True
-    return False
+def isPlayerInGameKick(player):
+    for party in parties.values():
+        if player in party.players and party.status != "end":            
+            party.status = "end"
 
 # Route pour l'inscription d'un utilisateur
-@app.route('/user/register', methods=['POST'])
+@app.route('/auth/register', methods=['POST'])
 def register():
-    data = request.json
-    username = data.get("username")
-    password = data.get("password")
+    username = request.json.get("username")
+    password = request.json.get("password")
 
     if not username or not password:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
@@ -79,12 +77,12 @@ def register():
     save_data('users.json', users)
     return jsonify({"status": "success", "message": "Utilisateur enregistré avec succès"})
 
+
 # Route pour la connexion d'un utilisateur
-@app.route('/user/login', methods=['POST'])
+@app.route('/auth/login', methods=['POST'])
 def login():
-    data = request.json
-    username = data.get("username")
-    password = data.get("password")
+    username = request.json.get("username")
+    password = request.json.get("password")
 
     if not username or not password:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
@@ -93,10 +91,9 @@ def login():
     if not user or user["password"] != hash_password(password):
         return jsonify({"status": "error", "message": "Identifiant ou mot de passe incorrect"}), 403
 
-    # Générer un token unique pour cet utilisateur
-    token = secrets.token_hex(16)
-    tokens[token] = username  # Associer le token au nom d'utilisateur
-
+    token = str(uuid.uuid4())
+    tokens[token] = username
+    save_data('tokens.json', tokens)
     return jsonify({"status": "success", "message": "Connexion réussie", "token": token})
 
 # Route pour créer une partie
@@ -106,18 +103,16 @@ def party_create():
     token = data.get("token")
     difficulty = data.get("difficulty")
 
-    # Obtenir le nom d'utilisateur à partir du token
-    player = get_username_from_token(token)
+    player = getUsername(token)
     if not player or not difficulty or player not in users:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
-    # Vérifier si le joueur est déjà dans une partie en cours
-    if is_player_in_game(player):
-        return jsonify({"status": "error", "message": "Vous êtes déjà dans une partie active"}), 400
+    isPlayerInGameKick(player)
 
     new_party = Party(player, difficulty)
-    parties.append(new_party)
+    parties[new_party.id] = new_party
     return jsonify({"status": "success", "id": new_party.id})
+
 
 # Route pour rejoindre une partie
 @app.route('/party/join', methods=['POST'])
@@ -126,26 +121,23 @@ def party_join():
     party_id = data.get("id")
     token = data.get("token")
 
-    # Obtenir le nom d'utilisateur à partir du token
-    player = get_username_from_token(token)
+    player = getUsername(token)
     if not party_id or not player or player not in users:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
-    # Vérifier si le joueur est déjà dans une partie en cours
-    if is_player_in_game(player):
-        return jsonify({"status": "error", "message": "Vous êtes déjà dans une partie active"}), 400
+    isPlayerInGameKick(player)
 
-    for party in parties:
-        if party.id == party_id:
-            if len(party.players) >= 2:
-                return jsonify({"status": "error", "message": "La partie est déjà pleine"}), 400
-            
-            if not party.add_player(player):
-                return jsonify({"status": "error", "message": "Le pseudo est déjà pris"}), 400
-            
-            return jsonify({"status": party.status})
-    
-    return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
+    if parties[party_id]:
+        party = parties[party_id]
+        if len(party.players) >= 2:
+            return jsonify({"status": "error", "message": "La partie est déjà pleine"}), 400
+        
+        if not party.add_player(player):
+            return jsonify({"status": "error", "message": "Le pseudo est déjà pris"}), 400
+        
+        return jsonify({"status": party.status})
+    else:
+        return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
 # Route pour obtenir le statut d'une partie
 @app.route('/party/status', methods=['GET'])
@@ -155,17 +147,17 @@ def party_status():
     if not party_id:
         return jsonify({"status": "error", "message": "ID de la partie manquant"}), 400
 
-    for party in parties:
-        if party.id == party_id:
-            return jsonify({
-                "id": party.id,
-                "players": party.players,
-                "difficulty": party.difficulty,
-                "status": party.status,
-                "current_player": party.current_player
-            })
-    
-    return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
+    if parties[party_id]:
+        party = parties[party_id]
+        return jsonify({
+            "id": party.id,
+            "players": party.players,
+            "difficulty": party.difficulty,
+            "status": party.status,
+            "current_player": party.current_player
+        })
+    else:
+        return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
 # Route pour tester un nombre dans le jeu
 @app.route('/party/test', methods=['POST'])
@@ -175,41 +167,39 @@ def party_test():
     token = data.get("token")
     num = data.get("num")
 
-    # Obtenir le nom d'utilisateur à partir du token
-    player = get_username_from_token(token)
+    player = getUsername(token)
     if not party_id or not player or num is None:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
-    for party in parties:
-        if party.id == party_id:
-            if party.current_player != player:
-                return jsonify({"status": "error", "message": "Ce n'est pas votre tour"}), 403
-            if party.num == num:
-                party.status = "end"
-                parties.remove(party)
-                users[player]["wins"] += 1
-                save_data('users.json', users)
-                return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})
-            elif party.num < num:
-                party.switch_turn()
-                return jsonify({"status": "start", "message": "Trop grand"})
-            elif party.num > num:
-                party.switch_turn()
-                return jsonify({"status": "start", "message": "Trop petit"})
-    
-    return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
+    if parties[party_id]:
+        party = parties[party_id]
+        if party.current_player != player:
+            return jsonify({"status": "error", "message": "Ce n'est pas votre tour"}), 403
+        if party.num == num:
+            party.status = "end"
+            parties.remove(party)
+            users[player]["wins"] += 1
+            save_data('users.json', users)
+            return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})
+        elif party.num < num:
+            party.switch_turn()
+            return jsonify({"status": "start", "message": "Trop grand"})
+        elif party.num > num:
+            party.switch_turn()
+            return jsonify({"status": "start", "message": "Trop petit"})
+    else:
+        return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
 # Route pour obtenir le classement
 @app.route('/rankings', methods=['GET'])
 def get_rankings():
     token = request.args.get("token")
-    player = get_username_from_token(token)
+    player = getUsername(token)
 
     if not player:
         return jsonify({"status": "error", "message": "Token invalide"}), 400
 
     sorted_users = sorted(users.items(), key=lambda x: x[1]["wins"], reverse=True)
-    # Limiter à 20 utilisateurs dans le classement
     top_20 = sorted_users[:20]
     player_rank = next((i+1 for i, user in enumerate(sorted_users) if user[0] == player), None)
 

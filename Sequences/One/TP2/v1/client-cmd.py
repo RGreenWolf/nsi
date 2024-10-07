@@ -49,7 +49,7 @@ while status != "end":
             res = requests.post(baseURL + "/party/test", json={"id": party.get("id"), "player": player, "num": num})
             result = res.json()
             status = result.get("status")
-            current_message = result.get("message")
+            current_message = result.get("message") 
         else:
             current_message = f"C'est au tour de {current_player} de jouer."
  
