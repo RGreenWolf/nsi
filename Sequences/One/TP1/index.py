@@ -53,7 +53,7 @@ def exercice_7():
     elif nombre < 0:
         print("Le nombre est négatif.")
     else:
-        print("Le nombre est zéro.")
+        print("Le nombre est nul.")
 
 def exercice_8():
     age = int(input("Entrez l'âge de l'enfant : "))
@@ -231,4 +231,4 @@ choix = input("Votre choix : ")
 if exercices.get(choix):
     exercices[choix]() 
 else:
-    print("Choix non valide, veuillez réessayer.")
+    print("Choix non valide, veuillez réessayer")
