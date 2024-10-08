@@ -228,7 +228,7 @@ def get_rankings():
 
 def commande():
     while True :
-        cmd = input("/")
+        cmd = input("")
         if cmd == "exit":
             os._exit(0)
         elif cmd == "users":
@@ -238,8 +238,8 @@ def commande():
             for token in tokens:
                 print(f"{token} : {tokens[token]}")
         elif cmd == "parties":
-            for party in parties:
-                print(f"{party.id} : {party['players']} - {party['status']}")
+            for party in parties.values():
+                print(f"{party.id} : {party.players} - {party.status}")
         elif cmd == "save":
             save_data('users.json', users)
             save_data('tokens.json', tokens)
