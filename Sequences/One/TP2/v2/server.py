@@ -117,7 +117,7 @@ def check_token():
 def party_create():
     data = request.json
     token = data.get("token")
-    difficulty = data.get("difficulty")
+    difficulty = int(data.get("difficulty"))
 
     player = getUsername(token)
     if not player or not difficulty or player not in users or difficulty < 0:
