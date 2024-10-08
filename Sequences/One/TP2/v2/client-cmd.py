@@ -49,7 +49,7 @@ def login():
         return token
     else:
         print(f"Erreur lors de la connexion : {res.json().get('message')}")
-        return None
+        return login()
 
 # Fonction pour consulter le classement
 def view_rankings(token):
@@ -99,8 +99,9 @@ def startGame(token, username, party):
 
         time.sleep(1)
 
-    if status == "end":
-        print("Fin de la partie")
+    endGame = requests.get(baseURL + "/party/status", params={"id": party.get("id")}).json()
+    if endGame.get("status") == "end":
+        print("Fin de la partie le gagnant est :", endGame.get("winner"))
 
 def verifyToken(token):
     verify = requests.get(baseURL + "/auth/check_token", params={"token": token})

@@ -33,6 +33,7 @@ class Party:
         self.status = "pending"
         self.num = random.randint(1, self.difficulty)
         self.current_player = player
+        self.winner = None
         print(f"Création de la partie {self.id} avec le nombre {self.num}")
 
     def add_player(self, player):
@@ -58,7 +59,10 @@ def getUsername(token):
 # Vérifier si un joueur est déjà dans une partie active
 def isPlayerInGameKick(player):
     for party in parties.values():
-        if player in party.players and party.status != "end":            
+        if player in party.players and party.status != "end":
+            party.players.remove(player)
+            playerTemp = party.players[0]
+            users[playerTemp]["wins"] += 1
             party.status = "end"
 
 # Route pour l'inscription d'un utilisateur
@@ -115,7 +119,7 @@ def party_create():
     difficulty = data.get("difficulty")
 
     player = getUsername(token)
-    if not player or not difficulty or player not in users:
+    if not player or not difficulty or player not in users or difficulty < 0:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
     isPlayerInGameKick(player)
@@ -165,7 +169,8 @@ def party_status():
             "players": party.players,
             "difficulty": party.difficulty,
             "status": party.status,
-            "current_player": party.current_player
+            "current_player": party.current_player,
+            "winner": party.winner
         })
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
@@ -188,7 +193,8 @@ def party_test():
             return jsonify({"status": "error", "message": "Ce n'est pas votre tour"}), 403
         if party.num == num:
             party.status = "end"
-            parties[party_id] = ""
+            parties[party_id].status = "end"
+            parties[party_id].winner = player
             users[player]["wins"] += 1
             save_data('users.json', users)
             return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})

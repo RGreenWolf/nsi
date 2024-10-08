@@ -36,7 +36,7 @@ def create_game(fenetre, labels, name):
         print(f"Erreur: {res.status_code}")
     if res.json()['status'] != 'error':
         afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
-        fenetre.quit()
+        fenetre.destroy()
         jeu(id, name)
 
 
@@ -47,6 +47,7 @@ def join_party(fenetre, join, name):
     res = requests.post(baseURL + "/party/join", json={"player": name, "id": id})
     if res.json()['status'] != 'error':
         afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
+        fenetre.destroy()
         jeu(id, name)
     else:
         print(f"Erreur: {res.json()['message']} ({res.status_code})")
@@ -69,18 +70,26 @@ def player(window):
     # current_player = res.json()['current_player']
     afficher_label(window, f"a {res['current_player']} de jouer", 0.5, 0.9, font=("Arial", 14))
 
-def requete_connexion(entry_login, enty_mdp):
+def requete_connexion(fenetre, entry_login, entry_mdp):
     login = entry_login.get()
-    mdp = enty_mdp.get()
+    mdp = entry_mdp.get()
     res = requests.post(baseURL + "/auth/login", json={"username": login, "password": mdp})
     if res.json().get("status") == "success":
         print("Connexion réussie !")
         token = res.json().get("token")
-        save_token(token, login)
+        save_token(token)
+
+        connexion(fenetre)
         return token
     else:
+        afficher_label(fenetre, f"Erreur : mot de passe ou pseudo invalide",0.5, 0.9)
         print(f"Erreur lors de la connexion : {res.json().get('message')}")
         return None
+
+def requete_register(window, entry_login, entry_mdp):
+    login = entry_login.get()
+    mdp = entry_mdp.get()
+    print(f"login {login} ; mdp {mdp}")
 
 def save_token(token):
     with open(token_file, 'w') as file:
@@ -106,7 +115,8 @@ def jeu(id, pseudo):
     window.mainloop()
 
 # Interface du connexion principal
-def connexion():
+def connexion(windows):
+    windows.destroy()
     fenetre = tk.Tk()
     fenetre.title("Deviner le nombre")
     fenetre.geometry("400x500")  # Taille de la fenêtre
@@ -144,7 +154,8 @@ def connexion():
 
     fenetre.mainloop()
 
-def page_connexion():
+def création_compte(windows):
+    windows.destroy()
     fenetre=tk.Tk()
     fenetre.geometry('300x300')
     Label_login = tk.Label(fenetre, text="entrez votre pseudo  :")
@@ -157,7 +168,25 @@ def page_connexion():
     entry_mdp = tk.Entry(fenetre, show="*")
     entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
 
-    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(entry_login, entry_mdp))
+    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
+    submit.place(relx=0.5, rely=0.7, anchor="center")
+
+
+def page_connexion(windows):
+    windows.destroy()
+    fenetre=tk.Tk()
+    fenetre.geometry('300x300')
+    Label_login = tk.Label(fenetre, text="entrez votre pseudo  :")
+    Label_login.place(relx=0.5, rely=0.1, anchor="center")
+    entry_login = tk.Entry(fenetre)
+    entry_login.place(relx=0.5, rely=0.2, anchor="center")
+
+    Label_mdp = tk.Label(fenetre, text="entrez votre mot de passe :")
+    Label_mdp.place(relx=0.5, rely=0.4, anchor="center")
+    entry_mdp = tk.Entry(fenetre, show="*")
+    entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
+
+    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
     submit.place(relx=0.5, rely=0.7, anchor="center")
     fenetre.mainloop()
 
@@ -165,9 +194,11 @@ def page_connexion():
 def menu():
     fenetre=tk.Tk()
     fenetre.geometry("300x300")
-    button_connecter= tk.Button(fenetre, text="se connecter", command=page_connexion)
+    button_connecter= tk.Button(fenetre, text="se connecter", command=lambda :page_connexion(fenetre))
     button_connecter.pack()
+    button_register= tk.Button(fenetre, text="se connecter", command=lambda :création_compte(fenetre))
+    button_register.pack()
     # button_connecter= tk.Button(fenetre, text="Anonyme", command=connexion)
     # button_connecter.pack()
     fenetre.mainloop()
-menu()
+création_compte()
