@@ -67,7 +67,7 @@ def register():
     username = request.json.get("username")
     password = request.json.get("password")
 
-    if not username or not password:
+    if not username or not password or len(username) < 3 or len(password) < 6 or len(username) > 20 or len(password) > 30:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
     
     if username in users:
@@ -84,7 +84,7 @@ def login():
     username = request.json.get("username")
     password = request.json.get("password")
 
-    if not username or not password:
+    if not username or not password or len(username) < 3 or len(password) < 6 or len(username) > 20 or len(password) > 30:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
     
     user = users.get(username)
@@ -102,8 +102,8 @@ def check_token():
     if not token:
         return jsonify({"status": "error", "message": "Token manquant"}), 400
     
-    if token in tokens:
-        return jsonify({"status": "success", "message": "Token valide"})
+    if tokens[token]:
+        return jsonify({"status": "success", "message": "Token valide", "username": tokens[token]})
     else:
         return jsonify({"status": "error", "message": "Token invalide"}), 403
 
@@ -188,7 +188,7 @@ def party_test():
             return jsonify({"status": "error", "message": "Ce n'est pas votre tour"}), 403
         if party.num == num:
             party.status = "end"
-            parties.remove(party)
+            parties[party_id] = ""
             users[player]["wins"] += 1
             save_data('users.json', users)
             return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})

@@ -9,19 +9,21 @@ baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 
 token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
 username = None
+token = None
+party = {}
 
 # Fonction pour charger le token depuis le fichier
 def load_token():
     if os.path.exists(token_file):
         with open(token_file, 'r') as file:
             data = json.load(file)
-            return data
+            return data.get('token')
     return None
 
 # Fonction pour sauvegarder le token dans le fichier
-def save_token(token, username):
+def save_token(token):
     with open(token_file, 'w') as file:
-        json.dump({'token': token, 'username': username}, file)
+        json.dump({'token': token}, file)
 
 # Fonction d'inscription
 def register():
@@ -43,7 +45,7 @@ def login():
     if res.json().get("status") == "success":
         print("Connexion réussie !")
         token = res.json().get("token")
-        save_token(token, username)
+        save_token(token)
         return token
     else:
         print(f"Erreur lors de la connexion : {res.json().get('message')}")
@@ -102,27 +104,27 @@ def startGame(token, username, party):
 
 # Fonction principale
 def main():
-    save = load_token()
-    token = save.get('token') if save else None
-    username = save.get('username') if save else None
-    party = {}
+    save = load_token() if os.path.exists(token_file) else None
+    if save:
+        verify = requests.get(baseURL + "/auth/check_token", params={"token": save})
+        verify = verify.json()
+        if verify['status'] == 'success':
+            print("Connexion automatique réussie !")
+            token = save
+            username = verify['username']
+        else:
+            os.remove(token_file)
+    else:
+        choice = input("Voulez-vous vous inscrire (r) ou vous connecter (l) ? ").lower()
+        if choice == "r":
+            token = register()
+        elif choice == "l":
+            token = login()
 
+    if not token:
+        exit()
+        
     while True:
-        if not token:
-            choice = input("Voulez-vous vous inscrire (r) ou vous connecter (l) ? ").lower()
-            if choice == "r":
-                token = register()
-            elif choice == "l":
-                token = login()
-            elif choice == "exit":
-                print("Au revoir !")
-                break
-            else:
-                print("Choix invalide.")
-                continue
-
-        if not token:
-            exit()
 
         # Menu principal après connexion
         menu = input("\nRejoindre ou créer une partie (r/c)\nConsulter le classement (v)\nQuitter (exit)\n").lower()

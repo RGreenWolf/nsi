@@ -1,215 +1,173 @@
 import tkinter as tk
-from tkinter import messagebox
 import requests
-import json
-import os
 import sys
-import time
-import threading
+import json
 
-baseURL = "http://localhost:5000"
+baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
 
-def load_token():
-    if os.path.exists(token_file):
-        with open(token_file, 'r') as file:
-            data = json.load(file)
-            return data
-    return None
 
-def save_token(token, username):
-    with open(token_file, 'w') as file:
-        json.dump({'token': token, 'username': username}, file)
-
-def auto_login():
-    save = load_token()
-    if save:
-        token = save.get('token')
-        username = save.get('username')
-        if token:
-            res = requests.get(baseURL + "/auth/check_token", params={"token": token})
-            if res.json().get("status") == "success":
-                messagebox.showinfo("Connexion réussie", f"Re-bienvenue {username} !")
-                main_menu_frame.tkraise()
-                return True
-            else:
-                messagebox.showerror("Erreur", "Le token a expiré. Veuillez vous reconnecter.")
-                return False
-    return False
-
-def register():
-    username = username_entry.get()
-    password = password_entry.get()
-    res = requests.post(baseURL + "/auth/register", json={"username": username, "password": password})
-    if res.json().get("status") == "success":
-        messagebox.showinfo("Inscription réussie", "Vous pouvez maintenant vous connecter.")
-        login_frame.tkraise()
+#pour les Label "dynamyque"
+def afficher_label(fenetre, text, relx, rely, font=("Arial", 12), fg="black", bg="#f0f0f0"):
+    if relx==None and rely==None :
+        label = tk.Label(fenetre, text=text, fg=fg, bg=bg, font=font)
+        label.pack()
     else:
-        messagebox.showerror("Erreur", res.json().get("message"))
+        label = tk.Label(fenetre, text=text, fg=fg, bg=bg, font=font)
+        label.place(relx=relx, rely=rely, anchor="center")  # Le centre du label est positionné à relx, rely
+        return label
 
-def login():
-    username = username_entry.get()
-    password = password_entry.get()
-    res = requests.post(baseURL + "/auth/login", json={"username": username, "password": password})
+
+# Fonction pour créer une partie
+def create_game(fenetre, labels, name):
+    name = name.get()
+    print("c'est bon")
+    res = requests.post(baseURL + "/party/create", json={"player": name, "difficulty": "10"})
+    print("tu as envoyé ta requète")
+    if res.status_code == 200:
+        id = res.json()['id']
+        print(f"ID de la partie: {id}")
+
+        new_game_id_label = tk.Label(fenetre, text=f"Nouvelle partie ID: {id}", bg="#f0f0f0", font=("Arial", 12))
+        new_game_id_label.place(relx=0.5, rely=0.6 + len(labels)*0.05, anchor="center")  # Centré horizontalement et un peu plus bas
+
+        labels.append(new_game_id_label)
+    else:
+        print(f"Erreur: {res.status_code}")
+    if res.json()['status'] != 'error':
+        afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
+        fenetre.quit()
+        jeu(id, name)
+
+
+# Fonction pour rejoindre une partie
+def join_party(fenetre, join, name):
+    id = join.get()
+    name = name.get()
+    res = requests.post(baseURL + "/party/join", json={"player": name, "id": id})
+    if res.json()['status'] != 'error':
+        afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
+        jeu(id, name)
+    else:
+        print(f"Erreur: {res.json()['message']} ({res.status_code})")
+
+
+# Fonction pour envoyer le résultat
+def envoyer_result(window, nombre, id, name):
+    resultat = nombre.get()
+    if resultat.isdigit():
+        print(f"le résultat est {resultat}")
+        res = requests.post(baseURL + "/party/test", json={"id": id, "player": name, "num": resultat})
+        print(res.text)
+        player(window)
+    else:
+        afficher_label(window,"Tu es connecté", None, None, fg='green')
+
+def player(window):
+    #envoyer une requête pour avoir current_player
+    res={'current_player': 'test'}
+    # current_player = res.json()['current_player']
+    afficher_label(window, f"a {res['current_player']} de jouer", 0.5, 0.9, font=("Arial", 14))
+
+def requete_connexion(entry_login, enty_mdp):
+    login = entry_login.get()
+    mdp = enty_mdp.get()
+    res = requests.post(baseURL + "/auth/login", json={"username": login, "password": mdp})
     if res.json().get("status") == "success":
+        print("Connexion réussie !")
         token = res.json().get("token")
-        save_token(token, username)
-        messagebox.showinfo("Connexion réussie", "Bienvenue !")
-        main_menu_frame.tkraise()
+        save_token(token, login)
+        return token
     else:
-        messagebox.showerror("Erreur", res.json().get("message"))
+        print(f"Erreur lors de la connexion : {res.json().get('message')}")
+        return None
 
-def create_game():
-    token = load_token().get("token")
-    difficulty = int(difficulty_entry.get())
-    res = requests.post(baseURL + "/party/create", json={"difficulty": difficulty, "token": token})
-    if res.json().get("status") == "success":
-        party_id = res.json().get("id")
-        messagebox.showinfo("Partie créée", f"Partie créée avec l'ID : {party_id}")
-        party_id_entry.delete(0, tk.END)
-        party_id_entry.insert(0, party_id)
-        game_frame.tkraise()
-        start_game(party_id)
-    else:
-        messagebox.showerror("Erreur", res.json().get("message"))
+def save_token(token):
+    with open(token_file, 'w') as file:
+        json.dump({'token': token}, file)
 
-def join_game():
-    party_id = party_id_entry.get()
-    token = load_token().get("token")
-    res = requests.post(baseURL + "/party/join", json={"id": party_id, "token": token})
-    if res.json().get("status") == "error":
-        messagebox.showerror("Erreur", res.json().get("message"))
-    else:
-        messagebox.showinfo("Succès", f"Vous avez rejoint la partie {party_id}")
-        game_frame.tkraise()
-        start_game(party_id)
+# Interface de jeu
+def jeu(id, pseudo):
+    window = tk.Tk()
+    window.title("Deviner le nombre")
+    window.geometry("400x300")  # Taille de la fenêtre
 
-def start_game(party_id):
-    def game_loop():
-        token = load_token().get("token")
-        username = load_token().get("username")
-        status = "pending"
-        last_message = ""
+    texte = tk.Label(window, text="Mettez le nombre :", font=("Arial", 14))
+    texte.place(relx=0.5, rely=0.3, anchor="center")
 
-        while status != "end":
-            res = requests.get(baseURL + "/party/status", params={"id": party_id})
-            party_data = res.json()
-            status = party_data.get("status")
+    nombre = tk.Entry(window, font=("Arial", 12), bd=2, relief="solid")
+    nombre.place(relx=0.5, rely=0.5, anchor="center")
 
-            if party_data.get("status") == "error":
-                messagebox.showerror("Erreur", party_data.get("message"))
-                break
+    bouton_validez = tk.Button(window, text="Validez", command=lambda: envoyer_result(window, nombre, id, pseudo),
+                               font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
+    bouton_validez.place(relx=0.5, rely=0.7, anchor="center")
 
-            current_message = ""
+    player(window)
+    window.mainloop()
 
-            if status == "pending":
-                current_message = "En attente d'un autre joueur..."
+# Interface du connexion principal
+def connexion():
+    fenetre = tk.Tk()
+    fenetre.title("Deviner le nombre")
+    fenetre.geometry("400x500")  # Taille de la fenêtre
+    fenetre.configure(bg="#f0f0f0")  # Couleur de fond
 
-            elif status == "start":
-                current_player = party_data.get("current_player")
-                if current_player == username:
-                    current_message = "C'est votre tour ! Entrez un nombre."
-                else:
-                    current_message = f"C'est au tour de {current_player} de jouer."
+    labels = []
 
-            if current_message != last_message:
-                game_message_label.config(text=current_message)
-                last_message = current_message
+    # Label et entrée pour le pseudo
+    pseudo_text = tk.Label(fenetre, text="Entrez votre pseudo :", bg="#f0f0f0", font=("Arial", 14))
+    pseudo_text.place(relx=0.5, rely=0.1, anchor="center")  # Centré en haut
 
-            if status == "start" and party_data.get("current_player") == username:
-                try:
-                    num = int(number_entry.get())
-                    res = requests.post(baseURL + "/party/test", json={"id": party_id, "token": token, "num": num})
-                    result = res.json()
-                    status = result.get("status")
-                    game_message_label.config(text=result.get("message"))
+    pseudo = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
+    pseudo.place(relx=0.5, rely=0.2, anchor="center")
 
-                    # Affichage spécial pour "Trop grand" ou "Trop petit"
-                    if "Trop grand" in result.get("message"):
-                        game_hint_label.config(text="Le nombre est trop grand !", fg="red")
-                    elif "Trop petit" in result.get("message"):
-                        game_hint_label.config(text="Le nombre est trop petit !", fg="blue")
-                    else:
-                        game_hint_label.config(text="")
-                except ValueError:
-                    messagebox.showwarning("Erreur", "Veuillez entrer un nombre valide.")
-                    continue
+    # Bouton pour commencer une nouvelle partie
+    start = tk.Button(fenetre, text="Commencer la partie", command=lambda: create_game(fenetre, labels, pseudo),
+                      font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
+    start.place(relx=0.5, rely=0.3, anchor="center")
 
-            time.sleep(1)
+    # Label et entrée pour rejoindre une partie
+    name_label = tk.Label(fenetre, text="Entrez votre pseudo :", bg="#f0f0f0", font=("Arial", 14))
+    name_label.place(relx=0.5, rely=0.4, anchor="center")
+    name_join = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
+    name_join.place(relx=0.5, rely=0.5, anchor="center")
 
-        if status == "end":
-            game_message_label.config(text="Fin de la partie")
-    
-    threading.Thread(target=game_loop).start()
+    name_label = tk.Label(fenetre, text="Entrez l'ID de la partie :", bg="#f0f0f0", font=("Arial", 14))
+    name_label.place(relx=0.5, rely=0.6, anchor="center")
+    join = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
+    join.place(relx=0.5, rely=0.7, anchor="center")
 
-def copy_party_id():
-    party_id = party_id_entry.get()
-    root.clipboard_clear()
-    root.clipboard_append(party_id)
-    messagebox.showinfo("ID copié", f"L'ID de la partie {party_id} a été copié dans le presse-papiers.")
+    # Bouton pour rejoindre une partie
+    button_join = tk.Button(fenetre, text="Rejoindre", command=lambda: join_party(fenetre, join, name_join),
+                            font=("Arial", 12), bg="#2196F3", fg="white", padx=20, pady=5)
+    button_join.place(relx=0.5, rely=0.8, anchor="center")
 
-# Interface graphique avec Tkinter
-root = tk.Tk()
-root.title("Jeu de Devine Nombre")
+    fenetre.mainloop()
 
-login_frame = tk.Frame(root)
-register_frame = tk.Frame(root)
-main_menu_frame = tk.Frame(root)
-game_frame = tk.Frame(root)
+def page_connexion():
+    fenetre=tk.Tk()
+    fenetre.geometry('300x300')
+    Label_login = tk.Label(fenetre, text="entrez votre pseudo  :")
+    Label_login.place(relx=0.5, rely=0.1, anchor="center")
+    entry_login = tk.Entry(fenetre)
+    entry_login.place(relx=0.5, rely=0.2, anchor="center")
 
-for frame in (login_frame, register_frame, main_menu_frame, game_frame):
-    frame.grid(row=0, column=0, sticky='news')
+    Label_mdp = tk.Label(fenetre, text="entrez votre mot de passe :")
+    Label_mdp.place(relx=0.5, rely=0.4, anchor="center")
+    entry_mdp = tk.Entry(fenetre, show="*")
+    entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
 
-# Écran de connexion
-tk.Label(login_frame, text="Connexion").grid(row=0, column=1)
-tk.Label(login_frame, text="Nom d'utilisateur").grid(row=1, column=0)
-username_entry = tk.Entry(login_frame)
-username_entry.grid(row=1, column=1)
-tk.Label(login_frame, text="Mot de passe").grid(row=2, column=0)
-password_entry = tk.Entry(login_frame, show="*")
-password_entry.grid(row=2, column=1)
-tk.Button(login_frame, text="Connexion", command=login).grid(row=3, column=1)
-tk.Button(login_frame, text="Inscription", command=lambda: register_frame.tkraise()).grid(row=4, column=1)
+    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(entry_login, entry_mdp))
+    submit.place(relx=0.5, rely=0.7, anchor="center")
+    fenetre.mainloop()
 
-# Écran d'inscription
-tk.Label(register_frame, text="Inscription").grid(row=0, column=1)
-tk.Label(register_frame, text="Nom d'utilisateur").grid(row=1, column=0)
-username_entry = tk.Entry(register_frame)
-username_entry.grid(row=1, column=1)
-tk.Label(register_frame, text="Mot de passe").grid(row=2, column=0)
-password_entry = tk.Entry(register_frame, show="*")
-password_entry.grid(row=2, column=1)
-tk.Button(register_frame, text="S'inscrire", command=register).grid(row=3, column=1)
-tk.Button(register_frame, text="Retour à la connexion", command=lambda: login_frame.tkraise()).grid(row=4, column=1)
-
-# Écran du menu principal
-tk.Label(main_menu_frame, text="Menu Principal").grid(row=0, column=1)
-party_id_entry = tk.Entry(main_menu_frame)
-party_id_entry.grid(row=1, column=1)
-tk.Label(main_menu_frame, text="ID de la partie").grid(row=1, column=0)
-tk.Button(main_menu_frame, text="Rejoindre Partie", command=join_game).grid(row=2, column=1)
-
-difficulty_entry = tk.Entry(main_menu_frame)
-difficulty_entry.grid(row=3, column=1)
-tk.Label(main_menu_frame, text="Difficulté").grid(row=3, column=0)
-tk.Button(main_menu_frame, text="Créer Partie", command=create_game).grid(row=4, column=1)
-
-# Bouton pour copier l'ID de la partie
-tk.Button(main_menu_frame, text="Copier l'ID de la Partie", command=copy_party_id).grid(row=5, column=1)
-
-# Écran de jeu
-tk.Label(game_frame, text="Jeu en cours").grid(row=0, column=1)
-game_message_label = tk.Label(game_frame, text="En attente...")
-game_message_label.grid(row=1, column=1)
-number_entry = tk.Entry(game_frame)
-number_entry.grid(row=2, column=1)
-tk.Label(game_frame, text="Entrez un nombre").grid(row=2, column=0)
-game_hint_label = tk.Label(game_frame, text="")
-game_hint_label.grid(row=3, column=1)
-tk.Button(game_frame, text="Envoyer", command=lambda: start_game(party_id_entry.get())).grid(row=4, column=1)
-tk.Button(game_frame, text="Quitter", command=lambda: main_menu_frame.tkraise()).grid(row=5, column=1)
-
-if not auto_login():
-    login_frame.tkraise()
-
-root.mainloop()
+#affiche le menu
+def menu():
+    fenetre=tk.Tk()
+    fenetre.geometry("300x300")
+    button_connecter= tk.Button(fenetre, text="se connecter", command=page_connexion)
+    button_connecter.pack()
+    # button_connecter= tk.Button(fenetre, text="Anonyme", command=connexion)
+    # button_connecter.pack()
+    fenetre.mainloop()
+menu()
