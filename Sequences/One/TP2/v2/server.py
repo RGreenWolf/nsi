@@ -1,3 +1,4 @@
+import threading
 from flask import Flask, request, jsonify
 import uuid
 import random
@@ -224,6 +225,32 @@ def get_rankings():
         "rankings": [{user[0]: user[1]["wins"]} for user in top_20],
         "your_rank": player_rank
     })
+
+def commande():
+    while True :
+        cmd = input("/")
+        if cmd == "exit":
+            os._exit(0)
+        elif cmd == "users":
+            for user in users:
+                print(f"{user} : {users[user].get('wins')} victoires")
+        elif cmd == "tokens":
+            for token in tokens:
+                print(f"{token} : {tokens[token]}")
+        elif cmd == "parties":
+            for party in parties:
+                print(f"{party.id} : {party['players']} - {party['status']}")
+        elif cmd == "save":
+            save_data('users.json', users)
+            save_data('tokens.json', tokens)
+            print("Données sauvegardées")
+        else:
+            print("Commande inconnue")
+        print("\n")
+        
+
+threadCmd = threading.Thread(target=commande)
+threadCmd.start()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

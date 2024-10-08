@@ -86,10 +86,22 @@ def requete_connexion(fenetre, entry_login, entry_mdp):
         print(f"Erreur lors de la connexion : {res.json().get('message')}")
         return None
 
-def requete_register(window, entry_login, entry_mdp):
+def requete_register(window, entry_login, entry_mdp, vérif_mdp):
     login = entry_login.get()
     mdp = entry_mdp.get()
-    print(f"login {login} ; mdp {mdp}")
+    ver_mdp = vérif_mdp.get()
+    if vérif_equal(mdp, ver_mdp):
+        
+        print(f"login {login} ; mdp {mdp}")
+    else:
+        afficher_label(window, "ce n'est pas égal", 0.5, 0.9, fg='#f32222')
+        print("ce n'est pas égale")
+
+def vérif_equal(mdp, vérif):
+    if mdp==vérif:
+        return True
+    else :
+        return False
 
 def save_token(token):
     with open(token_file, 'w') as file:
@@ -168,8 +180,13 @@ def création_compte(windows):
     entry_mdp = tk.Entry(fenetre, show="*")
     entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
 
-    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
-    submit.place(relx=0.5, rely=0.7, anchor="center")
+    Label_mdp_vérif = tk.Label(fenetre, text="vérification de mot de passe :")
+    Label_mdp_vérif.place(relx=0.5, rely=0.6, anchor="center")
+    entry_mdp_vérif = tk.Entry(fenetre, show="*")
+    entry_mdp_vérif.place(relx=0.5, rely=0.7, anchor="center")
+
+    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_register(fenetre, entry_login, entry_mdp, entry_mdp_vérif))
+    submit.place(relx=0.5, rely=0.8, anchor="center")
 
 
 def page_connexion(windows):
@@ -186,6 +203,7 @@ def page_connexion(windows):
     entry_mdp = tk.Entry(fenetre, show="*")
     entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
 
+
     submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
     submit.place(relx=0.5, rely=0.7, anchor="center")
     fenetre.mainloop()
@@ -196,9 +214,9 @@ def menu():
     fenetre.geometry("300x300")
     button_connecter= tk.Button(fenetre, text="se connecter", command=lambda :page_connexion(fenetre))
     button_connecter.pack()
-    button_register= tk.Button(fenetre, text="se connecter", command=lambda :création_compte(fenetre))
+    button_register= tk.Button(fenetre, text="créer un compte", command=lambda :création_compte(fenetre))
     button_register.pack()
     # button_connecter= tk.Button(fenetre, text="Anonyme", command=connexion)
     # button_connecter.pack()
     fenetre.mainloop()
-création_compte()
+menu()
