@@ -125,6 +125,7 @@ def main():
         username = verifyToken(token)
 
     if not token or not username:
+        print("Veillez relancer le jeu")
         exit()
         
     while True:
@@ -140,7 +141,7 @@ def main():
                     continue
                 else:
                     party["id"] = party_id
-                    print(f"Vous avez rejoint la partie {party_id}, le nombre est compris entre 1 et {res.json()["difficulty"]}")
+                    print(f"Vous avez rejoint la partie {party_id}, le nombre est compris entre 1 et {res.json().get('difficulty')}")
                     startGame(token, username, party)
 
             elif menu == "c":

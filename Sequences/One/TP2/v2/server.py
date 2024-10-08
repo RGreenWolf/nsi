@@ -102,7 +102,7 @@ def check_token():
     if not token:
         return jsonify({"status": "error", "message": "Token manquant"}), 400
     
-    if tokens[token]:
+    if tokens.get(token):
         return jsonify({"status": "success", "message": "Token valide", "username": tokens[token]})
     else:
         return jsonify({"status": "error", "message": "Token invalide"}), 403
