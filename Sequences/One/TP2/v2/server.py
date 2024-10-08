@@ -146,7 +146,7 @@ def party_join():
         if not party.add_player(player):
             return jsonify({"status": "error", "message": "Le pseudo est déjà pris"}), 400
         
-        return jsonify({"status": party.status})
+        return jsonify({"status": party.status, "difficulty": party.difficulty})
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 

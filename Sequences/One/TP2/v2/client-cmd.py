@@ -102,26 +102,29 @@ def startGame(token, username, party):
     if status == "end":
         print("Fin de la partie")
 
+def verifyToken(token):
+    verify = requests.get(baseURL + "/auth/check_token", params={"token": token})
+    verify = verify.json()
+    if verify['status'] == 'success':
+        return verify['username']
+    else:
+        os.remove(token_file)
+        return None
+
 # Fonction principale
 def main():
-    save = load_token() if os.path.exists(token_file) else None
-    if save:
-        verify = requests.get(baseURL + "/auth/check_token", params={"token": save})
-        verify = verify.json()
-        if verify['status'] == 'success':
-            print("Connexion automatique réussie !")
-            token = save
-            username = verify['username']
-        else:
-            os.remove(token_file)
+    token = load_token() if os.path.exists(token_file) else None
+    if token:
+        username = verifyToken(token)
     else:
         choice = input("Voulez-vous vous inscrire (r) ou vous connecter (l) ? ").lower()
         if choice == "r":
             token = register()
         elif choice == "l":
             token = login()
+        username = verifyToken(token)
 
-    if not token:
+    if not token or not username:
         exit()
         
     while True:
@@ -137,7 +140,7 @@ def main():
                     continue
                 else:
                     party["id"] = party_id
-                    print(f"Vous avez rejoint la partie {party_id}")
+                    print(f"Vous avez rejoint la partie {party_id}, le nombre est compris entre 1 et {res.json()["difficulty"]}")
                     startGame(token, username, party)
 
             elif menu == "c":
