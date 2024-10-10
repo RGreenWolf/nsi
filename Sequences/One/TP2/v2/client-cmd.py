@@ -4,8 +4,8 @@ import json
 import os
 import sys
 
-# baseURL = "http://localhost:5000"
-baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
+baseURL = "http://localhost:5000"
+# baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 
 token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
 username = None
@@ -69,7 +69,7 @@ def startGame(token, username, party):
     last_message = ""
 
     while status != "end":
-        res = requests.get(baseURL + "/party/status", params={"id": party.get("id")})
+        res = requests.get(baseURL + "/party/status", params={"token": token})
         party_data = res.json()
         status = party_data.get("status")
 
@@ -83,10 +83,11 @@ def startGame(token, username, party):
             current_message = "En attente d'un autre joueur..."
 
         elif status == "start":
+            my_turn = party_data.get("my_turn")
             current_player = party_data.get("current_player")
-            if current_player == username:
+            if my_turn:
                 num = int(input("Entrez un nombre : "))
-                res = requests.post(baseURL + "/party/test", json={"id": party.get("id"), "token": token, "num": num})
+                res = requests.post(baseURL + "/party/test", json={"token": token, "num": num})
                 result = res.json()
                 status = result.get("status")
                 current_message = result.get("message")
@@ -99,10 +100,11 @@ def startGame(token, username, party):
 
         time.sleep(1)
 
-    endGame = requests.get(baseURL + "/party/status", params={"id": party.get("id")}).json()
+    endGame = requests.get(baseURL + "/party/status", params={"token": token}).json()
     if endGame.get("status") == "end":
         print("Fin de la partie le gagnant est :", endGame.get("winner"))
 
+# Vérification du token
 def verifyToken(token):
     verify = requests.get(baseURL + "/auth/check_token", params={"token": token})
     verify = verify.json()
@@ -126,9 +128,9 @@ def main():
         username = verifyToken(token)
 
     if not token or not username:
-        print("Veillez relancer le jeu")
+        print("Veuillez relancer le jeu.")
         exit()
-        
+
     while True:
 
         # Menu principal après connexion

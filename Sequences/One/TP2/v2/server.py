@@ -4,9 +4,12 @@ import uuid
 import random
 import json
 import os
+import time
 import hashlib
 
 app = Flask(__name__)
+
+stop = False
 
 # Charger ou initialiser les utilisateurs et les classements depuis les fichiers JSON
 def load_data(file_name): 
@@ -30,24 +33,74 @@ class Party:
     def __init__(self, player, difficulty):
         self.id = str(uuid.uuid4()).split("-")[0]
         self.players = [player]
+        self.max_players = 2
         self.difficulty = int(difficulty)
         self.status = "pending"
+        self.public = False
         self.num = random.randint(1, self.difficulty)
         self.current_player = player
         self.winner = None
+        self.playerData = {}
+        self.playerData[player] = {
+            "time": getTimeArrond(),
+            "attempts": 0
+        }
+        self.time = {
+            "start": getTimeArrond(),
+            "end": None
+        }
         print(f"Création de la partie {self.id} avec le nombre {self.num}")
 
-    def add_player(self, player):
+    def addPlayer(self, player):
         if player in self.players:
             return False
         self.players.append(player)
+        self.playerData[player] = {
+            "time": getTimeArrond(),
+            "attempts": 0
+        }
         if len(self.players) == 2:
             self.status = "start"
         return True
 
+    def start(self):
+        if len(self.players) == self.max_players:
+            self.current_player = random.choice(self.players)
+            self.status = "start"
+
+    def isPlayerInGame(self, player):
+        return player in self.players
+    
+    def isPlayerTurn(self, player):
+        return self.current_player == player
+
     def switch_turn(self):
         if len(self.players) == 2:
             self.current_player = self.players[1] if self.current_player == self.players[0] else self.players[0]
+    
+    def getPointsWin(self, player):
+        return self.difficulty/self.playerData[player]["attempts"] * 10
+
+    def win(self, player):
+        self.winner = player
+        self.time["end"] = getTimeArrond()
+        self.status = "end"
+        users[player]["wins"] += 1
+        users[player]["points"] += self.getPointsWin(player)
+        self.players.clear()
+        save_data('users.json', users)
+
+    def forfait(self, player):
+        self.players.remove(player)
+        if self.players:
+            self.win(self.players[0])
+        else:
+            self.status = "end"
+        save_data('users.json', users)
+
+
+def getTimeArrond():
+    return round(time.time())
 
 # Fonction de hachage du mot de passe
 def hash_password(password):
@@ -62,15 +115,23 @@ def isPlayerInGameKick(player):
     for party in parties.values():
         if player in party.players and party.status != "end":
             party.players.remove(player)
-            playerTemp = party.players[0]
-            users[playerTemp]["wins"] += 1
+            if party.players:  # Check if there are still players left
+                playerTemp = party.players[0]
+                users[playerTemp]["wins"] += 1
             party.status = "end"
+
+def getParty(player):
+    for party in parties.values():
+        if player in party.players:
+            return party
+    return None
 
 # Route pour l'inscription d'un utilisateur
 @app.route('/auth/register', methods=['POST'])
 def register():
-    username = request.json.get("username")
-    password = request.json.get("password")
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
 
     if not username or not password or len(username) < 3 or len(password) < 6 or len(username) > 20 or len(password) > 30:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
@@ -78,7 +139,7 @@ def register():
     if username in users:
         return jsonify({"status": "error", "message": "L'utilisateur existe déjà"}), 400
 
-    users[username] = {"password": hash_password(password), "wins": 0}
+    users[username] = {"password": hash_password(password), "wins": 0, "points": 0, }
     save_data('users.json', users)
     return jsonify({"status": "success", "message": "Utilisateur enregistré avec succès"})
 
@@ -86,8 +147,9 @@ def register():
 # Route pour la connexion d'un utilisateur
 @app.route('/auth/login', methods=['POST'])
 def login():
-    username = request.json.get("username")
-    password = request.json.get("password")
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
 
     if not username or not password or len(username) < 3 or len(password) < 6 or len(username) > 20 or len(password) > 30:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
@@ -126,6 +188,8 @@ def party_create():
     isPlayerInGameKick(player)
 
     new_party = Party(player, difficulty)
+    print( new_party.playerData)
+    new_party.playerData[player]
     parties[new_party.id] = new_party
     return jsonify({"status": "success", "id": new_party.id})
 
@@ -145,12 +209,13 @@ def party_join():
 
     if parties[party_id]:
         party = parties[party_id]
-        if len(party.players) >= 2:
+        if len(party.players) >= party.max_players:
+            party.start()
             return jsonify({"status": "error", "message": "La partie est déjà pleine"}), 400
         
-        if not party.add_player(player):
+        if not party.addPlayer(player):
             return jsonify({"status": "error", "message": "Le pseudo est déjà pris"}), 400
-        
+
         return jsonify({"status": party.status, "difficulty": party.difficulty})
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
@@ -158,19 +223,19 @@ def party_join():
 # Route pour obtenir le statut d'une partie
 @app.route('/party/status', methods=['GET'])
 def party_status():
-    party_id = request.args.get("id")
+    token = request.args.get("token")
+    username = getUsername(token)
+    party = getParty(username)
 
-    if not party_id:
-        return jsonify({"status": "error", "message": "ID de la partie manquant"}), 400
-
-    if parties[party_id]:
-        party = parties[party_id]
+    if party:
+        party.playerData[username]["time"] = getTimeArrond()
         return jsonify({
             "id": party.id,
             "players": party.players,
             "difficulty": party.difficulty,
             "status": party.status,
             "current_player": party.current_player,
+            "my_turn": party.isPlayerTurn(username),
             "winner": party.winner
         })
     else:
@@ -180,31 +245,31 @@ def party_status():
 @app.route('/party/test', methods=['POST'])
 def party_test():
     data = request.json
-    party_id = data.get("id")
+
     token = data.get("token")
     num = data.get("num")
 
-    player = getUsername(token)
-    if not party_id or not player or num is None:
+    username = getUsername(token)
+    party = getParty(username)
+
+    if not party or not username or num is None:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
-    if parties[party_id]:
-        party = parties[party_id]
-        if party.current_player != player:
-            return jsonify({"status": "error", "message": "Ce n'est pas votre tour"}), 403
+    print(party.playerData[username])
+    party.playerData[username]["attempts"] += 1
+
+    if party:
+        if not party.isPlayerTurn(username):
+            return jsonify({"status": party.status, "message": "Ce n'est pas votre tour"}), 403
         if party.num == num:
-            party.status = "end"
-            parties[party_id].status = "end"
-            parties[party_id].winner = player
-            users[player]["wins"] += 1
-            save_data('users.json', users)
-            return jsonify({"status": "end", "message": "Bravo ! Vous avez trouvé le nombre."})
+            party.win(username)
+            return jsonify({"status": party.status, "message": "Bravo ! Vous avez trouvé le nombre."})
         elif party.num < num:
             party.switch_turn()
-            return jsonify({"status": "start", "message": "Trop grand"})
+            return jsonify({"status": party.status, "message": "Trop grand"})
         elif party.num > num:
             party.switch_turn()
-            return jsonify({"status": "start", "message": "Trop petit"})
+            return jsonify({"status": party.status, "message": "Trop petit"})
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
@@ -222,15 +287,17 @@ def get_rankings():
     player_rank = next((i+1 for i, user in enumerate(sorted_users) if user[0] == player), None)
 
     return jsonify({
-        "rankings": [{user[0]: user[1]["wins"]} for user in top_20],
+        "rankings": [
+            {"username": user[0], "wins": user[1]["wins"]} for user in top_20],
         "your_rank": player_rank
     })
 
 def commande():
+    global stop
     while True :
         cmd = input("")
         if cmd == "exit":
-            os._exit(0)
+            stop = True
         elif cmd == "users":
             for user in users:
                 print(f"{user} : {users[user].get('wins')} victoires")
@@ -248,13 +315,58 @@ def commande():
             print("Commande inconnue")
         print("\n")
 
-threadCmd = threading.Thread(target=commande)
+def ticks():
+    tick_count = 0
+    while True:
+        if tick_count % 10 == 0 and tick_count != 0:
+            for party in list(parties.values()):
+                if party.status == "end" and len(party.players) < 2:
+                    del parties[party.id]
+
+        if tick_count % 60 == 0 and tick_count != 0:
+            save_data('users.json', users)
+            save_data('tokens.json', tokens)
+            print("Données sauvegardées")
+
+        if tick_count % 5 == 0 and tick_count != 0:
+            for party in list(parties.values()):
+                for player in list(party.players):
+                    if (getTimeArrond() - party.playerData[player]["time"]) > 10:
+                        party.forfait(player)
+                        print(f"Le joueur {player} a été exclu de la partie {party.id} pour inactivité")
+    
+        if stop:
+            break
+
+        time.sleep(1)
+        tick_count += 1
+    os._exit(0)
 
 def startServer():
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
+threadCmd = threading.Thread(target=commande)
 threadWeb = threading.Thread(target=startServer)
+threadTicks = threading.Thread(target=ticks)
+
+def init(): 
+    for user in users:
+        if "wins" not in users[user]:
+            users[user]["wins"] = 0
+        if "points" not in users[user]:
+            users[user]["points"] = 0
+    save_data('users.json', users)
 
 if __name__ == '__main__':
-    threadWeb.start()
-    threadCmd.start()
+    try:
+        init()
+        threadWeb.start()
+        threadTicks.start()
+        threadCmd.start()
+        threadCmd.join() 
+    except Exception as e:
+        print(f"Erreur: {e}")
+    finally:
+        stop = True
+        threadWeb.join()
+        threadTicks.join()

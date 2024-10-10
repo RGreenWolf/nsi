@@ -2,9 +2,34 @@ import tkinter as tk
 import requests
 import sys
 import json
+import os
+import time
 
+#rajouez un bouton retour ou menu
+
+#définition des constant
 baseURL = "https://nsi.rgreenwolf.fr/mini-play/nombre"
 token_file = f"{sys.argv[1]}.json" if len(sys.argv) > 1 else 'client.json'
+
+def load_token():
+    if os.path.exists(token_file):
+        with open(token_file, 'r') as file:
+            data = json.load(file)
+            return data
+    return None
+
+def save_token(token, username):
+    with open(token_file, 'w') as file:
+        json.dump({'token': token, 'username': username}, file)
+
+#définition des constant
+try:
+    token_client = load_token().get('token')
+    data= load_token()
+except:
+    token_client=None
+    data=None
+
 
 
 #pour les Label "dynamyque"
@@ -19,71 +44,72 @@ def afficher_label(fenetre, text, relx, rely, font=("Arial", 12), fg="black", bg
 
 
 # Fonction pour créer une partie
-def create_game(fenetre, labels, name):
-    name = name.get()
-    print("c'est bon")
-    res = requests.post(baseURL + "/party/create", json={"player": name, "difficulty": "10"})
-    print("tu as envoyé ta requète")
-    if res.status_code == 200:
-        id = res.json()['id']
+def create_party(fenetre, difficulty):
+    difficulty =difficulty.get()
+    print( baseURL + "/party/create", {'token' : token_client, "difficulty": difficulty})
+    res = requests.post(baseURL + "/party/create", json={'token' : token_client, "difficulty": difficulty})
+    if res.status_code == 200 and res.json().get('status') != 'error':
+        id = res.json().get('id')
         print(f"ID de la partie: {id}")
-
-        new_game_id_label = tk.Label(fenetre, text=f"Nouvelle partie ID: {id}", bg="#f0f0f0", font=("Arial", 12))
-        new_game_id_label.place(relx=0.5, rely=0.6 + len(labels)*0.05, anchor="center")  # Centré horizontalement et un peu plus bas
-
-        labels.append(new_game_id_label)
-    else:
-        print(f"Erreur: {res.status_code}")
-    if res.json()['status'] != 'error':
-        afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
+        afficher_label(fenetre,f"Tu es connecté et l'id est : {res.json().get(id)}", 0.5, 0.9, fg='green')
         fenetre.destroy()
-        jeu(id, name)
+        jeu(id)
+    else:
+        afficher_label(fenetre,f"Erreur: {res.status_code}", None, None)
 
 
 # Fonction pour rejoindre une partie
-def join_party(fenetre, join, name):
+def join_party(fenetre, join):
     id = join.get()
-    name = name.get()
-    res = requests.post(baseURL + "/party/join", json={"player": name, "id": id})
-    if res.json()['status'] != 'error':
+    res = requests.post(baseURL + "/party/join", json={"token": token_client, "id": id})
+    if res.status_code == 200 and res.json().get('status') != 'error':
         afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
         fenetre.destroy()
-        jeu(id, name)
+        jeu(id)
     else:
-        print(f"Erreur: {res.json()['message']} ({res.status_code})")
+        afficher_label(fenetre, f"Erreur: {res.json()['message']} ({res.status_code})", None, None)
+
+def check_ranking(fentre):
+    res = requests.post(baseURL + "/rankings", json={"token": token_client, "id": id})
+    if res.status_code==200:
+        print(res.json().get("rankings"))
+        print(res.json().get("your_rank"))
 
 
 # Fonction pour envoyer le résultat
-def envoyer_result(window, nombre, id, name):
+def envoyer_result(window, nombre, id):
     resultat = nombre.get()
     if resultat.isdigit():
-        print(f"le résultat est {resultat}")
-        res = requests.post(baseURL + "/party/test", json={"id": id, "player": name, "num": resultat})
-        print(res.text)
-        player(window)
+        res = requests.post(baseURL + "/party/test", json={"id": id, "token": token_client, "num": int(resultat)})
+        if res.status_code==200 and res.json().get("status")=="start":
+            afficher_label(window, res.json()['message'], 0.5, 0.9, fg='#f32222')
+        elif res.status_code==200 and res.json().get("status")=="end":
+            afficher_label(window, "Bravo !", 0.5, 0.9, fg='green')
+        else:
+            afficher_label(window, "erreur", 0.5, 0.9, fg='green')
+
+        player(window, id)
+        
     else:
         afficher_label(window,"Tu es connecté", None, None, fg='green')
 
-def player(window):
+def player(window, id):
     #envoyer une requête pour avoir current_player
-    res={'current_player': 'test'}
+    res = requests.get(baseURL + "/party/status", params=id)
     # current_player = res.json()['current_player']
-    afficher_label(window, f"a {res['current_player']} de jouer", 0.5, 0.9, font=("Arial", 14))
+    afficher_label(window, f"a {res.json().get('current_player')} de jouer", 0.5, 0.7, font=("Arial", 14))
 
 def requete_connexion(fenetre, entry_login, entry_mdp):
     login = entry_login.get()
     mdp = entry_mdp.get()
     res = requests.post(baseURL + "/auth/login", json={"username": login, "password": mdp})
     if res.json().get("status") == "success":
-        print("Connexion réussie !")
         token = res.json().get("token")
-        save_token(token)
-
+        save_token(token, login)
         connexion(fenetre)
         return token
     else:
         afficher_label(fenetre, f"Erreur : mot de passe ou pseudo invalide",0.5, 0.9)
-        print(f"Erreur lors de la connexion : {res.json().get('message')}")
         return None
 
 def requete_register(window, entry_login, entry_mdp, vérif_mdp):
@@ -91,11 +117,24 @@ def requete_register(window, entry_login, entry_mdp, vérif_mdp):
     mdp = entry_mdp.get()
     ver_mdp = vérif_mdp.get()
     if vérif_equal(mdp, ver_mdp):
-        
         print(f"login {login} ; mdp {mdp}")
-    else:
-        afficher_label(window, "ce n'est pas égal", 0.5, 0.9, fg='#f32222')
+    else :
         print("ce n'est pas égale")
+        afficher_label(window, "ce n'est pas égal", 0.5, 0.9, fg='#f32222')
+        
+
+    res = requests.post(baseURL + "/auth/register", json={"username": login, "password": mdp})
+    print("requète connexion faite ")
+    if res.json().get("status") == "success":
+        print("Inscription réussie !\nVous pouvez maintenant vous connecter.")
+        res_co = requests.post(baseURL + "/auth/login", json={"username": login, "password": mdp})
+        if res_co.json().get("status")=="sucess":
+            print("connexion réussi")
+        else:
+            print("connéxion raté")
+    else:
+        print(f"Erreur lors de l'inscription : {res.json().get('message')}")
+        return None
 
 def vérif_equal(mdp, vérif):
     if mdp==vérif:
@@ -103,27 +142,40 @@ def vérif_equal(mdp, vérif):
     else :
         return False
 
-def save_token(token):
-    with open(token_file, 'w') as file:
-        json.dump({'token': token}, file)
+def window_close():
+    return False
 
+def requète_current(id):
+    res = requests.get(baseURL + "/party/status", params=id)
+    if res.status_code!=200 and res.json().get('status') =='pending':
+        return True
+    return False
 # Interface de jeu
-def jeu(id, pseudo):
+def jeu(id):
+    fenetre = tk.Tk()
+    fenetre.geometry('200x200')
+    afficher_label(fenetre, "en attente d'un autre joueur", 0.5, 0.4)
+    fenetre.mainloop()
+    while True:
+        if requète_current(id):
+            break
+        time.sleep(2)
     window = tk.Tk()
     window.title("Deviner le nombre")
     window.geometry("400x300")  # Taille de la fenêtre
-
+    new_game_id_label = tk.Label(window, text=f"Nouvelle partie ID: {id}", bg="#f0f0f0", font=("Arial", 12))
+    new_game_id_label.place(relx=0.7, rely=0.1, anchor="center")
     texte = tk.Label(window, text="Mettez le nombre :", font=("Arial", 14))
-    texte.place(relx=0.5, rely=0.3, anchor="center")
+    texte.place(relx=0.5, rely=0.2, anchor="center")
 
     nombre = tk.Entry(window, font=("Arial", 12), bd=2, relief="solid")
-    nombre.place(relx=0.5, rely=0.5, anchor="center")
+    nombre.place(relx=0.5, rely=0.3, anchor="center")
 
-    bouton_validez = tk.Button(window, text="Validez", command=lambda: envoyer_result(window, nombre, id, pseudo),
+    bouton_validez = tk.Button(window, text="Validez", command=lambda: envoyer_result(window, nombre, id),
                                font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
-    bouton_validez.place(relx=0.5, rely=0.7, anchor="center")
+    bouton_validez.place(relx=0.5, rely=0.5, anchor="center")
 
-    player(window)
+    player(window, id)
     window.mainloop()
 
 # Interface du connexion principal
@@ -134,36 +186,27 @@ def connexion(windows):
     fenetre.geometry("400x500")  # Taille de la fenêtre
     fenetre.configure(bg="#f0f0f0")  # Couleur de fond
 
-    labels = []
-
-    # Label et entrée pour le pseudo
-    pseudo_text = tk.Label(fenetre, text="Entrez votre pseudo :", bg="#f0f0f0", font=("Arial", 14))
-    pseudo_text.place(relx=0.5, rely=0.1, anchor="center")  # Centré en haut
-
-    pseudo = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
-    pseudo.place(relx=0.5, rely=0.2, anchor="center")
-
+    afficher_label(fenetre, "entrez le max :", 0.5, 0.1)
+    Entry_difficulty = tk.Entry(fenetre)
+    Entry_difficulty.place(relx=0.5, rely=0.2, anchor='center')
     # Bouton pour commencer une nouvelle partie
-    start = tk.Button(fenetre, text="Commencer la partie", command=lambda: create_game(fenetre, labels, pseudo),
+    start = tk.Button(fenetre, text="Créer une nouvelle partie", command=lambda: create_party(fenetre, Entry_difficulty),
                       font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
     start.place(relx=0.5, rely=0.3, anchor="center")
 
-    # Label et entrée pour rejoindre une partie
-    name_label = tk.Label(fenetre, text="Entrez votre pseudo :", bg="#f0f0f0", font=("Arial", 14))
-    name_label.place(relx=0.5, rely=0.4, anchor="center")
-    name_join = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
-    name_join.place(relx=0.5, rely=0.5, anchor="center")
-
-    name_label = tk.Label(fenetre, text="Entrez l'ID de la partie :", bg="#f0f0f0", font=("Arial", 14))
-    name_label.place(relx=0.5, rely=0.6, anchor="center")
+    
+    id_label = tk.Label(fenetre, text="Entrez l'ID de la partie :", bg="#f0f0f0", font=("Arial", 14))
+    id_label.place(relx=0.5, rely=0.5, anchor="center")
     join = tk.Entry(fenetre, font=("Arial", 12), bd=2, relief="solid")
-    join.place(relx=0.5, rely=0.7, anchor="center")
+    join.place(relx=0.5, rely=0.6, anchor="center")
 
     # Bouton pour rejoindre une partie
-    button_join = tk.Button(fenetre, text="Rejoindre", command=lambda: join_party(fenetre, join, name_join),
+    button_join = tk.Button(fenetre, text="Rejoindre", command=lambda: join_party(fenetre, join),
                             font=("Arial", 12), bg="#2196F3", fg="white", padx=20, pady=5)
     button_join.place(relx=0.5, rely=0.8, anchor="center")
 
+    use_other = tk.Button(fenetre, text="utiliser un autre compte", command=lambda:page_connexion(fenetre, False))
+    use_other.place(relx=0.5, rely=0.7, anchor="center")
     fenetre.mainloop()
 
 def création_compte(windows):
@@ -189,34 +232,38 @@ def création_compte(windows):
     submit.place(relx=0.5, rely=0.8, anchor="center")
 
 
-def page_connexion(windows):
-    windows.destroy()
-    fenetre=tk.Tk()
-    fenetre.geometry('300x300')
-    Label_login = tk.Label(fenetre, text="entrez votre pseudo  :")
-    Label_login.place(relx=0.5, rely=0.1, anchor="center")
-    entry_login = tk.Entry(fenetre)
-    entry_login.place(relx=0.5, rely=0.2, anchor="center")
+def page_connexion(windows, auto):
+    res = requests.get(baseURL +"/auth/check_token", params={'token' : token_client})
+    if res.status_code == 200 and res.json().get('status') =='success' and auto:
+        connexion(windows)
+    else:
+        windows.destroy()
+        fenetre=tk.Tk()
+        fenetre.geometry('300x300')
+        Label_login = tk.Label(fenetre, text="entrez votre pseudo  :")
+        Label_login.place(relx=0.5, rely=0.1, anchor="center")
+        entry_login = tk.Entry(fenetre)
+        entry_login.place(relx=0.5, rely=0.2, anchor="center")
 
-    Label_mdp = tk.Label(fenetre, text="entrez votre mot de passe :")
-    Label_mdp.place(relx=0.5, rely=0.4, anchor="center")
-    entry_mdp = tk.Entry(fenetre, show="*")
-    entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
+        Label_mdp = tk.Label(fenetre, text="entrez votre mot de passe :")
+        Label_mdp.place(relx=0.5, rely=0.4, anchor="center")
+        entry_mdp = tk.Entry(fenetre, show="*")
+        entry_mdp.place(relx=0.5, rely=0.5, anchor="center")
 
-
-    submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
-    submit.place(relx=0.5, rely=0.7, anchor="center")
-    fenetre.mainloop()
+        submit= tk.Button(fenetre, text="se connecter", command=lambda:requete_connexion(fenetre, entry_login, entry_mdp))
+        submit.place(relx=0.5, rely=0.7, anchor="center")
+        fenetre.mainloop()
 
 #affiche le menu
 def menu():
     fenetre=tk.Tk()
     fenetre.geometry("300x300")
-    button_connecter= tk.Button(fenetre, text="se connecter", command=lambda :page_connexion(fenetre))
+    button_connecter= tk.Button(fenetre, text="se connecter", command=lambda :page_connexion(fenetre, True))
     button_connecter.pack()
     button_register= tk.Button(fenetre, text="créer un compte", command=lambda :création_compte(fenetre))
     button_register.pack()
     # button_connecter= tk.Button(fenetre, text="Anonyme", command=connexion)
     # button_connecter.pack()
     fenetre.mainloop()
-menu()
+check_ranking("on s'en fout")
+# bas nan pk ?
