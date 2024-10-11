@@ -142,6 +142,9 @@ def getParty(player):
             return party
     return None
 
+def isPartyExiste(party_id):
+    return party_id in parties
+
 # Route pour l'inscription d'un utilisateur
 @app.route('/auth/register', methods=['POST'])
 def register():
@@ -222,7 +225,7 @@ def party_join():
 
     isPlayerInGameKick(player)
 
-    if parties[party_id]:
+    if isPartyExiste(party_id):
         party = parties[party_id]
         if len(party.players) >= party.max_players:
             party.start()

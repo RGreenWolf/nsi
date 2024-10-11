@@ -67,6 +67,7 @@ def create_party(fenetre, difficulty):
 def join_party(fenetre, join):
     id = join.get()
     res = requests.post(baseURL + "/party/join", json={"token": token_client, "id": id})
+    print(res.text)
     if res.status_code == 200 and res.json().get('status') != 'error':
         afficher_label(fenetre,"Tu es connecté", 0.5, 0.9, fg='green')
         fenetre.destroy()
@@ -154,15 +155,14 @@ def vérif_equal(mdp, vérif):
 def window_close():
     return False
 
-def requète_current(id,res):
+def requète_current(id, good):
     while True:
-        res = requests.get(baseURL + "/party/status", json={'id': id, 'token' : token_client})
-        print(res.text)
-        try: 
-            pending = res.json().get('status') !='pending' 
-        except: pending =False
+        print("requete")
+        res = requests.get(baseURL + "/party/status", params={'id': id, 'token' : token_client})
+        try: pending = res.json().get('status') !='pending'
+        except: print("pending");pending = False
         if res.status_code!=200 and pending:
-            res=True
+            good[0]=True
             return
         time.sleep(1)
 
@@ -174,7 +174,7 @@ def page_ranking():
 
 # Interface de jeu
 def jeu(id):
-    res=False
+    res=[False]
     thread = threading.Thread(target=requète_current, args=(id, res))
     thread.daemon = True
     thread.start()
@@ -183,7 +183,9 @@ def jeu(id):
     afficher_label(fenetre, "en attente d'un autre joueur", 0.5, 0.4)
     afficher_label(fenetre, f"id :{id}", 0.5, 0.5)
     fenetre.mainloop()
-    if res:
+    print("on est bon 1")
+    if res[0]:
+        print("on est bon")
         fenetre.destroy()
         window = tk.Tk()
         window.title("Deviner le nombre")
