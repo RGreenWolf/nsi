@@ -60,8 +60,7 @@ def view_rankings(token):
         return
     print("Classement des joueurs :")
     for rank, player in enumerate(rankings, 1):
-        for name, wins in player.items():
-            print(f"{rank}. {name} - {wins} victoires")
+        print(f"{rank}. {player['username']} - {player['wins']} victoires")
 
 # Fonction pour démarrer une partie
 def startGame(token, username, party):
@@ -134,9 +133,9 @@ def main():
     while True:
 
         # Menu principal après connexion
-        menu = input("\nRejoindre ou créer une partie (r/c)\nConsulter le classement (v)\nQuitter (exit)\n").lower()
+        menu = input("\nRejoindre ou créer une partie ou trouver une partie (j/c/r)\nConsulter le classement (v)\nQuitter (exit)\n").lower()
         try:
-            if menu == "r":
+            if menu == "j":
                 party_id = input("Entrez l'identifiant de la partie : ")
                 res = requests.post(baseURL + "/party/join", json={"id": party_id, "token": token})
                 if res.json().get("status") == "error":
@@ -149,13 +148,24 @@ def main():
 
             elif menu == "c":
                 difficulty = int(input("Entrez la difficulté (un nombre entier) : "))
-                res = requests.post(baseURL + "/party/create", json={"difficulty": difficulty, "token": token})
+                public = input("Voulez-vous que la partie soit publique (o/n) ? ").lower()
+                res = requests.post(baseURL + "/party/create", json={"difficulty": difficulty, "token": token, "public": public == "o"})
                 if res.json().get("status") == "error":
                     print(f"Erreur : {res.json().get('message')}")
                     continue
                 else:
                     party["id"] = res.json().get("id")
                     print(f"Partie créée avec l'ID : {party['id']}")
+                    startGame(token, username, party)
+
+            elif menu == "t":
+                res = requests.get(baseURL + "/party/random", params={"token": token})
+                if res.json().get("status") == "error":
+                    print(f"Erreur : {res.json().get('message')}")
+                    continue
+                else:
+                    party["id"] = res.json().get("id")
+                    print(f"Vous avez rejoint la partie {party['id']}, le nombre est compris entre 1 et {res.json().get('difficulty')}")
                     startGame(token, username, party)
 
             elif menu == "v":

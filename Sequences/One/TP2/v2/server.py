@@ -31,13 +31,13 @@ parties = {}
 
 # Classe de partie
 class Party:
-    def __init__(self, player, difficulty):
+    def __init__(self, player, difficulty, public=False):
         self.id = str(uuid.uuid4()).split("-")[0]
         self.players = [player]
         self.max_players = 2
         self.difficulty = int(difficulty)
         self.status = "pending"
-        self.public = False
+        self.public = public
         self.num = random.randint(1, self.difficulty)
         self.current_player = player
         self.winner = None
@@ -104,6 +104,12 @@ class Party:
                 self.playerData[player]["attempts"] = 0
             self.playerData[player]["attempts"] += 1
 
+    def checkMaxPlayers(self):
+        return len(self.players) == self.max_players
+
+    def getWinner(self):
+        return self.winner
+
     def getStatus(self, player):
         return {
             "id": self.id,
@@ -124,7 +130,8 @@ def hash_password(password):
 
 # Fonction utilitaire pour obtenir le nom d'utilisateur à partir d'un token
 def getUsername(token):
-    return tokens[token]
+    if token in tokens: 
+        return tokens[token]
 
 # Vérifier si un joueur est déjà dans une partie active
 def isPlayerInGameKick(player):
@@ -144,6 +151,9 @@ def getParty(player):
 
 def isPartyExiste(party_id):
     return party_id in parties
+
+def getPublicParties():
+    return [party for party in parties.values() if party.public and party.status == "pending" and not party.checkMaxPlayers()]
 
 # Route pour l'inscription d'un utilisateur
 @app.route('/auth/register', methods=['POST'])
@@ -199,6 +209,7 @@ def party_create():
     data = request.json
     token = data.get("token")
     difficulty = int(data.get("difficulty"))
+    public = int(data.get("public")) if data.get("public") else False
 
     player = getUsername(token)
     if not player or not difficulty or player not in users or difficulty < 0:
@@ -206,7 +217,7 @@ def party_create():
 
     isPlayerInGameKick(player)
 
-    new_party = Party(player, difficulty)
+    new_party = Party(player, difficulty, public)
     new_party.playerData[player]
     parties[new_party.id] = new_party
     return jsonify({"status": "success", "id": new_party.id})
@@ -281,6 +292,24 @@ def party_test():
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
+@app.route('/party/random', methods=['GET'])
+def party_random():
+    token = request.args.get("token")
+    username = getUsername(token)
+    if not username:
+        return jsonify({"status": "error", "message": "Token invalide"}), 400
+
+    parties_public = getPublicParties()
+
+    if len(parties_public) == 0:
+        return jsonify({"status": "error", "message": "Aucune partie publique disponible"}), 404
+
+    party_id = random.choice([party.id for party in parties_public])
+    if isPartyExiste(party_id):
+        party = parties[party_id]
+        return jsonify({"status": party.status, "id": party.id, "difficulty": party.difficulty})
+    
+
 # Route pour obtenir le classement
 @app.route('/rankings', methods=['GET'])
 def get_rankings():
@@ -304,7 +333,7 @@ def get_rankings():
 def get_public_parties():
     return jsonify({
         "parties": [
-            {"id": party.id, "difficulty": party.difficulty} for party in parties.values() if party.public
+            {"id": party.id, "difficulty": party.difficulty} for party in getPublicParties()
         ]
     })
 
@@ -352,10 +381,11 @@ def ticks():
             print("Données sauvegardées")
 
         for party in list(parties.values()):
-            for player in list(party.players):
-                if getTimeArrond() - party.playerData[player]["time"] > 60:
-                    party.forfait(player)
-                    print(f"Le joueur {player} a été exclu de la partie {party.id} pour inactivité")
+            if party.status == "start" and party.checkMaxPlayers() and getTimeArrond() - party.playerData[party.current_player]["time"] > 60 :
+                for player in list(party.players):
+                    if getTimeArrond() - party.playerData[player]["time"] > 60:
+                        party.forfait(player)
+                        print(f"Le joueur {player} a été exclu de la partie {party.id} pour inactivité")
     
         if stop:
             break
