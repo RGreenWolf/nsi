@@ -98,7 +98,7 @@ def startGame(token, username, party):
             print(current_message)
             last_message = current_message
 
-        time.sleep(1)
+        time.sleep(0.5)
 
     endGame = requests.get(baseURL + "/party/status", params={"token": token}).json()
     if endGame.get("status") == "end":

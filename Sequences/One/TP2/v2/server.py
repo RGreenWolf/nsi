@@ -10,6 +10,7 @@ import hashlib
 app = Flask(__name__)
 
 stop = False
+tps = 0
 
 # Charger ou initialiser les utilisateurs et les classements depuis les fichiers JSON
 def load_data(file_name): 
@@ -59,8 +60,7 @@ class Party:
             "time": getTimeArrond(),
             "attempts": 0
         }
-        if len(self.players) == 2:
-            self.status = "start"
+        self.start()
         return True
 
     def start(self):
@@ -79,7 +79,8 @@ class Party:
             self.current_player = self.players[1] if self.current_player == self.players[0] else self.players[0]
     
     def getPointsWin(self, player):
-        return self.difficulty/self.playerData[player]["attempts"] * 10
+        print(self.playerData[player]["attempts"])
+        return round(self.difficulty/self.playerData[player]["attempts"] * 10, 2)
 
     def win(self, player):
         self.winner = player
@@ -87,7 +88,6 @@ class Party:
         self.status = "end"
         users[player]["wins"] += 1
         users[player]["points"] += self.getPointsWin(player)
-        self.players.clear()
         save_data('users.json', users)
 
     def forfait(self, player):
@@ -98,6 +98,22 @@ class Party:
             self.status = "end"
         save_data('users.json', users)
 
+    def addAttempt(self, player):
+        if player in self.playerData:
+            if "attempts" not in self.playerData[player]:
+                self.playerData[player]["attempts"] = 0
+            self.playerData[player]["attempts"] += 1
+
+    def getStatus(self, player):
+        return {
+            "id": self.id,
+            "players": self.players,
+            "difficulty": self.difficulty,
+            "status": self.status,
+            "current_player": self.current_player,
+            "my_turn": self.isPlayerTurn(player),
+            "winner": self.winner
+        }
 
 def getTimeArrond():
     return round(time.time())
@@ -188,7 +204,6 @@ def party_create():
     isPlayerInGameKick(player)
 
     new_party = Party(player, difficulty)
-    print( new_party.playerData)
     new_party.playerData[player]
     parties[new_party.id] = new_party
     return jsonify({"status": "success", "id": new_party.id})
@@ -229,15 +244,7 @@ def party_status():
 
     if party:
         party.playerData[username]["time"] = getTimeArrond()
-        return jsonify({
-            "id": party.id,
-            "players": party.players,
-            "difficulty": party.difficulty,
-            "status": party.status,
-            "current_player": party.current_player,
-            "my_turn": party.isPlayerTurn(username),
-            "winner": party.winner
-        })
+        return jsonify(party.getStatus(username))
     else:
         return jsonify({"status": "error", "message": "Partie non trouvée"}), 404
 
@@ -255,9 +262,7 @@ def party_test():
     if not party or not username or num is None:
         return jsonify({"status": "error", "message": "Données invalides"}), 400
 
-    print(party.playerData[username])
-    party.playerData[username]["attempts"] += 1
-
+    party.addAttempt(username)
     if party:
         if not party.isPlayerTurn(username):
             return jsonify({"status": party.status, "message": "Ce n'est pas votre tour"}), 403
@@ -292,12 +297,23 @@ def get_rankings():
         "your_rank": player_rank
     })
 
+@app.route('/parties/public', methods=['GET'])
+def get_public_parties():
+    return jsonify({
+        "parties": [
+            {"id": party.id, "difficulty": party.difficulty} for party in parties.values() if party.public
+        ]
+    })
+
 def commande():
     global stop
+    global tps
     while True :
         cmd = input("")
         if cmd == "exit":
             stop = True
+        elif cmd == "tps":
+            print(f"Temps d'exécution moyen : {tps} secondes")
         elif cmd == "users":
             for user in users:
                 print(f"{user} : {users[user].get('wins')} victoires")
@@ -317,27 +333,31 @@ def commande():
 
 def ticks():
     tick_count = 0
+    timeToTick = time.time()
+    global stop
+    global tps
     while True:
+        timeToTick = time.time()
         if tick_count % 10 == 0 and tick_count != 0:
             for party in list(parties.values()):
                 if party.status == "end" and len(party.players) < 2:
                     del parties[party.id]
 
-        if tick_count % 60 == 0 and tick_count != 0:
+        if tick_count % 120 == 0 and tick_count != 0:
             save_data('users.json', users)
             save_data('tokens.json', tokens)
             print("Données sauvegardées")
 
-        if tick_count % 5 == 0 and tick_count != 0:
-            for party in list(parties.values()):
-                for player in list(party.players):
-                    if (getTimeArrond() - party.playerData[player]["time"]) > 10:
-                        party.forfait(player)
-                        print(f"Le joueur {player} a été exclu de la partie {party.id} pour inactivité")
+        for party in list(parties.values()):
+            for player in list(party.players):
+                if getTimeArrond() - party.playerData[player]["time"] > 60:
+                    party.forfait(player)
+                    print(f"Le joueur {player} a été exclu de la partie {party.id} pour inactivité")
     
         if stop:
             break
-
+        
+        tps = time.time() - timeToTick + 1
         time.sleep(1)
         tick_count += 1
     os._exit(0)

@@ -4,6 +4,7 @@ import sys
 import json
 import os
 import time
+import threading
 
 #rajouez un bouton retour ou menu
 
@@ -46,7 +47,11 @@ def afficher_label(fenetre, text, relx, rely, font=("Arial", 12), fg="black", bg
 # Fonction pour créer une partie
 def create_party(fenetre, difficulty):
     difficulty =difficulty.get()
-    print( baseURL + "/party/create", {'token' : token_client, "difficulty": difficulty})
+    try:
+        int(difficulty)
+    except:
+        afficher_label(fenetre, "entrez un nombre", None, None)
+        return
     res = requests.post(baseURL + "/party/create", json={'token' : token_client, "difficulty": difficulty})
     if res.status_code == 200 and res.json().get('status') != 'error':
         id = res.json().get('id')
@@ -70,10 +75,13 @@ def join_party(fenetre, join):
         afficher_label(fenetre, f"Erreur: {res.json()['message']} ({res.status_code})", None, None)
 
 def check_ranking(fentre):
-    res = requests.post(baseURL + "/rankings", json={"token": token_client, "id": id})
+    res = requests.get(baseURL + "/rankings", params={"token": token_client, "id": id})
     if res.status_code==200:
-        print(res.json().get("rankings"))
-        print(res.json().get("your_rank"))
+        top = res.json().get("rankings")
+        for joueur in top:
+            for pseudo, victoires in joueur.items():
+                afficher_label(fentre, f"{pseudo} : {victoires}", None, None)
+        afficher_label(fentre,f"tu as le rang : {res.json().get("your_rank")}", None, None)
 
 
 # Fonction pour envoyer le résultat
@@ -95,8 +103,9 @@ def envoyer_result(window, nombre, id):
 
 def player(window, id):
     #envoyer une requête pour avoir current_player
-    res = requests.get(baseURL + "/party/status", params=id)
-    # current_player = res.json()['current_player']
+    print(id)
+    res = requests.get(baseURL + "/party/status", json={'id': id, 'token' : token_client})
+    print(res.status_code)
     afficher_label(window, f"a {res.json().get('current_player')} de jouer", 0.5, 0.7, font=("Arial", 14))
 
 def requete_connexion(fenetre, entry_login, entry_mdp):
@@ -145,38 +154,70 @@ def vérif_equal(mdp, vérif):
 def window_close():
     return False
 
-def requète_current(id):
-    res = requests.get(baseURL + "/party/status", params=id)
-    if res.status_code!=200 and res.json().get('status') =='pending':
-        return True
-    return False
+def requète_current(id,res):
+    while True:
+        res = requests.get(baseURL + "/party/status", json={'id': id, 'token' : token_client})
+        print(res.text)
+        try: 
+            pending = res.json().get('status') !='pending' 
+        except: pending =False
+        if res.status_code!=200 and pending:
+            res=True
+            return
+        time.sleep(1)
+
+
+def page_ranking():
+    window=tk.Tk()
+    check_ranking(window)
+    window.mainloop()
+
 # Interface de jeu
 def jeu(id):
+    res=False
+    thread = threading.Thread(target=requète_current, args=(id, res))
+    thread.daemon = True
+    thread.start()
     fenetre = tk.Tk()
     fenetre.geometry('200x200')
     afficher_label(fenetre, "en attente d'un autre joueur", 0.5, 0.4)
+    afficher_label(fenetre, f"id :{id}", 0.5, 0.5)
     fenetre.mainloop()
-    while True:
-        if requète_current(id):
-            break
-        time.sleep(2)
-    window = tk.Tk()
-    window.title("Deviner le nombre")
-    window.geometry("400x300")  # Taille de la fenêtre
-    new_game_id_label = tk.Label(window, text=f"Nouvelle partie ID: {id}", bg="#f0f0f0", font=("Arial", 12))
-    new_game_id_label.place(relx=0.7, rely=0.1, anchor="center")
-    texte = tk.Label(window, text="Mettez le nombre :", font=("Arial", 14))
-    texte.place(relx=0.5, rely=0.2, anchor="center")
+    if res:
+        fenetre.destroy()
+        window = tk.Tk()
+        window.title("Deviner le nombre")
+        window.geometry("400x300")  # Taille de la fenêtre
+        new_game_id_label = tk.Label(window, text=f"Nouvelle partie ID: {id}", bg="#f0f0f0", font=("Arial", 12))
+        new_game_id_label.place(relx=0.7, rely=0.1, anchor="center")
+        texte = tk.Label(window, text="Mettez le nombre :", font=("Arial", 14))
+        texte.place(relx=0.5, rely=0.2, anchor="center")
 
-    nombre = tk.Entry(window, font=("Arial", 12), bd=2, relief="solid")
-    nombre.place(relx=0.5, rely=0.3, anchor="center")
+        nombre = tk.Entry(window, font=("Arial", 12), bd=2, relief="solid")
+        nombre.place(relx=0.5, rely=0.3, anchor="center")
 
-    bouton_validez = tk.Button(window, text="Validez", command=lambda: envoyer_result(window, nombre, id),
-                               font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
-    bouton_validez.place(relx=0.5, rely=0.5, anchor="center")
+        bouton_validez = tk.Button(window, text="Validez", command=lambda: envoyer_result(window, nombre, id),
+                                font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5)
+        bouton_validez.place(relx=0.5, rely=0.5, anchor="center")
 
-    player(window, id)
-    window.mainloop()
+        player(window, id)
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        # Créer les coordonnées pour dessiner un coeur
+        t = np.linspace(0, 2 * np.pi, 1000)
+        x = 16 * np.sin(t)**3
+        y = 13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t)
+
+        # Tracer le coeur
+        plt.plot(x, y, color='red')
+        plt.title('Coeur')
+        plt.fill(x, y, 'red')
+        plt.axis('equal')  # Maintient les proportions égales pour les axes
+        plt.show()
+
+        window.mainloop()
+    
 
 # Interface du connexion principal
 def connexion(windows):
@@ -203,10 +244,12 @@ def connexion(windows):
     # Bouton pour rejoindre une partie
     button_join = tk.Button(fenetre, text="Rejoindre", command=lambda: join_party(fenetre, join),
                             font=("Arial", 12), bg="#2196F3", fg="white", padx=20, pady=5)
-    button_join.place(relx=0.5, rely=0.8, anchor="center")
+    button_join.place(relx=0.5, rely=0.7, anchor="center")
 
     use_other = tk.Button(fenetre, text="utiliser un autre compte", command=lambda:page_connexion(fenetre, False))
-    use_other.place(relx=0.5, rely=0.7, anchor="center")
+    use_other.place(relx=0.5, rely=0.8, anchor="center")
+    ranking=tk.Button(fenetre, text="ranking", command=page_ranking)
+    ranking.place(relx=0.8, rely=0.9)
     fenetre.mainloop()
 
 def création_compte(windows):
@@ -265,5 +308,4 @@ def menu():
     # button_connecter= tk.Button(fenetre, text="Anonyme", command=connexion)
     # button_connecter.pack()
     fenetre.mainloop()
-check_ranking("on s'en fout")
-# bas nan pk ?
+menu()
