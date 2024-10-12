@@ -37,6 +37,7 @@ def register():
         print(f"Erreur lors de l'inscription : {res.json().get('message')}")
         return None
 
+
 # Fonction de connexion
 def login():
     username = input("Entrez votre nom d'utilisateur : ")

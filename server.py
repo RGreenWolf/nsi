@@ -35,3 +35,4 @@ threadWeb = threading.Thread(target=startServer)
 if __name__ == '__main__':
     threadWeb.start()
     threadCmd.start()
+

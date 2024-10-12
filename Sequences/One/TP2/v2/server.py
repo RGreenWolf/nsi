@@ -132,6 +132,8 @@ def hash_password(password):
 def getUsername(token):
     if token in tokens: 
         return tokens[token]
+    else:
+        print("sa")
 
 # Vérifier si un joueur est déjà dans une partie active
 def isPlayerInGameKick(player):
