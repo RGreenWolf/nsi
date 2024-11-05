@@ -22,8 +22,7 @@ def save_data(file_name, data):
 
 
 def commande():
-    while True :
-        cmd = input("")
+    sa = 0
 
 threadCmd = threading.Thread(target=commande)
 
