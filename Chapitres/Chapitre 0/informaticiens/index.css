@@ -1,0 +1,94 @@
+h1 { 
+    text-align: center; font-size: 60px;
+    color: rgb(0, 255, 13);
+}
+
+body { 
+    background-image: url(maths-background.jpg);
+    background-size: auto;
+    background-size: cover;
+    background-attachment: fixed;
+    backdrop-filter: blur(4px);
+    margin: 0;
+}
+
+body { 
+    color: rgb(0, 0, 0); 
+}
+
+button { 
+    font-size: 33px; 
+}
+
+
+p { 
+    color: rgb(255, 255, 255); 
+}
+
+img {
+    position: relative;
+    left: 35px;
+    
+    width: 450px;
+    height: 450px;
+    object-fit: cover;
+}
+
+.alanturing {
+    position: absolute;
+    left: 150px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.euclide {
+    position: absolute;
+    left: 650px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.linustorvalds {
+    position: absolute;
+    left: 1050px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.richardstallman {
+    position: absolute;
+    left: 1500px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.timbernerslee {
+    position: absolute;
+    left: 150px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.stevejobs {
+    position: absolute;
+    left: 650px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.billgates {
+    position: absolute;
+    left: 1050px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+.adalovelace {
+    position: absolute;
+    left: 1500px;
+    font-size: 40px;
+    color: rgb(216, 216, 216);
+}
+
+
+

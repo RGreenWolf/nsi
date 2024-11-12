@@ -1,0 +1,91 @@
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+body {
+  background:url("img/back.webp")
+}
+
+
+header{
+    background: #000000cf;
+    color: aliceblue;
+}
+
+img{
+    width: 250px;
+}
+
+nav{
+    display: inline-flex;
+}
+
+a{
+    margin: 20px;
+}
+
+#cryptographie{
+    background: url("img/cryp");
+    background-size: cover;
+}
+
+#turing{
+    background: url("img/alan_turing.jpg");
+    background-size: cover;
+}
+
+#informaticiens{
+    background: url("img/informaticiens.jpg");
+}
+
+#internet{
+    background: url("img/web_tbl.jpg");
+    background-size: cover;
+}
+
+#os{
+    background: url("img/MS-DOS.png");  
+}
+
+#prof{
+    background: url("img/prof.png"); 
+    background-size: cover; 
+}
+
+#machines{
+    background: url("img/machine.webp"); 
+    background-size: cover; 
+}
+
+#langages{
+    background: url("img/langage.jpg"); 
+    background-size: cover; 
+}
+
+#libre{
+    background: url("img/libre.jpg"); 
+    background-size: cover; 
+}
+
+
+
+
+.box-nav{
+    width: 250px;
+    height: 250px;
+    border: 1px solid black;
+    border-radius: 50px;
+}
+
+.box-nav:hover{
+    width: 260px;
+    border-color: red;
+    border-width: 3px;
+}
+
+.box-nav h4{
+    text-decoration: none;
+    background: #faebd7a1;
+    font-size: 25px;
+}

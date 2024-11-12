@@ -1,0 +1,45 @@
+.T1 {
+    background-color:grey;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(247, 243, 243);
+    stroke: black;
+    width:20%;
+}
+.T2 {
+    background-color:grey;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(251, 246, 246);
+    stroke: black;
+    width:20%;
+    
+}
+.T3 {
+    background-color:grey;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(244, 236, 236);
+    stroke: black;
+    width:20%;
+}
+.T4 {
+    background-color:grey;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(243, 240, 240);
+    stroke: black;
+    width:20%;
+}
+table {
+    width: 100%;
+    height: 10%;
+    background-color: black;
+}
+body{
+    background-image: url(ARPANET.jpg);
+    background-size: cover;
+    color:white;
+    font-family:"fantasy";
+}
+.p {color: white;}

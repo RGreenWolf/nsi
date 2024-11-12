@@ -1,0 +1,49 @@
+.T1 {
+    background-color: rgb(135, 103, 6);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(247, 243, 243);
+    stroke: black;
+    width:20%;
+    color:white
+}
+.T2 {
+    background-color: rgb(135, 103, 6);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(251, 246, 246);
+    stroke: black;
+    width:20%;
+    
+}
+.T3 {
+    background-color: rgb(135, 103, 6);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(244, 236, 236);
+    stroke: black;
+    width:20%;
+}
+.T4 {
+    background-color: rgb(135, 103, 6);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(243, 240, 240);
+    stroke: black;
+    width:20%;
+}
+table {
+    width: 100%;
+    height: 10%;
+}
+body{
+    background-image: url(Tv.png);
+    background-size: cover;
+    color:white;
+}
+.p {color:white}
+
+.img {
+    left: 200px;
+margin: 2%;}
+.text {align-items: center;}

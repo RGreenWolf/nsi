@@ -1,0 +1,57 @@
+
+
+.T1 {
+    background-color:royalblue;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(247, 243, 243);
+    stroke: black;
+    width:20%;
+}
+.T2 {
+    background-color:royalblue;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(251, 246, 246);
+    stroke: black;
+    width:20%;
+    
+}
+.T3 {
+    background-color:royalblue;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(244, 236, 236);
+    stroke: black;
+    width:20%;
+}
+.T4 {
+    background-color:royalblue;
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(243, 240, 240);
+    stroke: black;
+    width:20%;
+}
+table {
+    width: 100%;
+    height: 10%;
+}
+body{
+    background-image: url(serv.jpg);
+    background-size: cover;
+    color:white;
+}
+.p {color: white;}
+
+.img {
+    height:65%;
+    width:100%;
+}
+
+.PASCAL{
+    width:50%;
+    height:20%;
+}
+
+

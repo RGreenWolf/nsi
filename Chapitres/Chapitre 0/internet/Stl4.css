@@ -1,0 +1,58 @@
+.T1 {
+    background-color: rgb(127, 131, 135);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(247, 243, 243);
+    stroke: black;
+    width:20%;
+}
+.T2 {
+    background-color: rgb(127, 131, 135);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(251, 246, 246);
+    stroke: black;
+    width:20%;
+    
+}
+.T3 {
+    background-color: rgb(127, 131, 135);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(244, 236, 236);
+    stroke: black;
+    width:20%;
+}
+.T4 {
+    background-color: rgb(127, 131, 135);
+    background-size: cover;
+    font-family: Impact;
+    color:rgb(243, 240, 240);
+    stroke: black;
+    width:20%;
+}
+table {
+    width: 100%;
+    height: 10%;
+    background-color:slategrey;
+}
+body{
+    background-image: url(seveur.jpg);
+    background-size: cover;
+    font-family:Arial;
+    color: white;
+}
+.p {color: white;}
+
+.GABRIEL{
+    height:50%;
+    width:100%;
+}
+.GABRIEL2{
+    height:100%;
+    width:100%;
+}
+.GABRIEL3{
+    height:50%;
+    width:50%;
+}
