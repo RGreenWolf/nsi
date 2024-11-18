@@ -58,3 +58,9 @@ def maximum(tableau):
 print("Exercice 6 :")
 print(maximum(tableau))
 print("\n")
+
+
+def moyenne(notes): return sum(notes) / len(notes)
+
+notes = [15, 12, 18, 10, 14]
+print("La moyenne est :", moyenne(notes))

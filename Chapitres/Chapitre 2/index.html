@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur Logique Drag & Drop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #canvas {
+            width: 100%;
+            height: 60vh;
+            border: 1px solid #ccc;
+            position: relative;
+            overflow: hidden;
+        }
+        .component {
+            width: 100px;
+            height: 60px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            line-height: 60px;
+            border-radius: 4px;
+            position: absolute;
+            cursor: grab;
+        }
+        .variable {
+            background-color: #28a745;
+        }
+        .output {
+            background-color: #dc3545;
+        }
+        #toolbar {
+            padding: 10px;
+            background-color: #f4f4f4;
+            display: flex;
+            gap: 10px;
+        }
+        .toolbar-item {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        #truthTable {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <div class="toolbar-item" onclick="addVariable()">Variable</div>
+        <div class="toolbar-item" onclick="addComponent('AND')">AND</div>
+        <div class="toolbar-item" onclick="addComponent('OR')">OR</div>
+        <div class="toolbar-item" onclick="generateTruthTable()">Générer</div>
+    </div>
+    <div id="canvas"></div>
+    <div id="truthTable"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsplumb@2.15.6/dist/js/jsplumb.min.js"></script>
+    <script>
+        const jsPlumbInstance = jsPlumb.getInstance({
+            Container: "canvas",
+            Connector: ["Bezier", { curviness: 50 }],
+            Endpoint: ["Dot", { radius: 5 }],
+            PaintStyle: { stroke: "#5c96bc", strokeWidth: 2 },
+            HoverPaintStyle: { stroke: "#1e8151", strokeWidth: 2 },
+            ConnectionOverlays: [
+                ["Arrow", { width: 10, length: 10, location: 1 }],
+            ],
+        });
+
+        const canvas = document.getElementById("canvas");
+        let componentCounter = 0;
+        let variableCounter = "A".charCodeAt(0); // Commence avec 'A'
+
+        let variables = [];
+        let components = [];
+        let output = null;
+
+        // Fonction pour ajouter une variable
+        function addVariable() {
+            const id = `variable-${componentCounter++}`;
+            const variableName = String.fromCharCode(variableCounter++);
+            const variable = document.createElement("div");
+            variable.id = id;
+            variable.className = "component variable";
+            variable.innerText = variableName;
+            variable.style.top = `${Math.random() * 300}px`;
+            variable.style.left = `${Math.random() * 500}px`;
+
+            canvas.appendChild(variable);
+
+            jsPlumbInstance.draggable(variable);
+            jsPlumbInstance.addEndpoint(variable, {
+                anchor: "Right",
+                isSource: true,
+                isTarget: false,
+                maxConnections: 1,
+            });
+
+            variables.push(variableName); // Ajouter la variable à la liste
+            updateFormula();
+            generateTruthTable();
+        }
+
+        // Fonction pour ajouter un composant logique (AND/OR)
+        function addComponent(type) {
+            const id = `component-${componentCounter++}`;
+            const component = document.createElement("div");
+            component.id = id;
+            component.className = "component";
+            component.innerText = type;
+            component.style.top = `${Math.random() * 300}px`;
+            component.style.left = `${Math.random() * 500}px`;
+
+            canvas.appendChild(component);
+
+            jsPlumbInstance.draggable(component);
+            jsPlumbInstance.addEndpoint(component, {
+                anchor: [0, 0.3, -1, 0], 
+                isSource: false,
+                isTarget: true,
+                maxConnections: 1,
+            });
+            jsPlumbInstance.addEndpoint(component, {
+                anchor: [0, 0.7, -1, 0], 
+                isSource: false,
+                isTarget: true,
+                maxConnections: 1,
+            });
+            jsPlumbInstance.addEndpoint(component, {
+                anchor: "Right",
+                isSource: true,
+                isTarget: false,
+                maxConnections: 1,
+            });
+
+            components.push({ type, id }); // Ajouter le composant à la liste
+            updateFormula();
+            generateTruthTable();
+        }
+
+        // Fonction pour ajouter le bloc de sortie directement sur la carte
+        function addOutput() {
+            const id = `output-${componentCounter++}`;
+            output = document.createElement("div");
+            output.id = id;
+            output.className = "component output";
+            output.innerText = "Sortie";
+            output.style.top = `${Math.random() * 300}px`;
+            output.style.left = `${Math.random() * 500}px`;
+
+            canvas.appendChild(output);
+
+            jsPlumbInstance.draggable(output);
+            jsPlumbInstance.addEndpoint(output, {
+                anchor: "Left",
+                isSource: false,
+                isTarget: true,
+                maxConnections: 1,
+            });
+
+            updateFormula(); // Mise à jour de la formule dès l'ajout du bloc de sortie
+            generateTruthTable(); // Génération immédiate du tableau de vérité
+        }
+
+        // Ajouter le bloc de sortie dès le démarrage
+        window.onload = () => {
+            addOutput(); // Ajout automatique du bloc de sortie dès le début
+        };
+
+        // Mettre à jour la formule dans le bloc de sortie
+        function updateFormula() {
+            const connections = jsPlumbInstance.getAllConnections();
+            if (connections.length === 0) {
+                return;
+            }
+
+            const expression = connections.map(connection => {
+                const source = connection.source.innerText.trim();
+                const target = connection.target.innerText.trim();
+                const operator = connection.source.innerText.includes("AND") ? "." : "+";
+                return `(${source}${operator}${target})`;
+            });
+
+            if (output) {
+                output.innerText = "Sortie: " + expression.join(".");
+            }
+        }
+
+        // Générer et afficher le tableau de vérité
+        function generateTruthTable() {
+            const tableDiv = document.getElementById("truthTable");
+            tableDiv.innerHTML = ""; // Réinitialiser le tableau
+
+            if (variables.length === 0) {
+                return;
+            }
+
+            const numVariables = variables.length;
+            const numRows = Math.pow(2, numVariables);
+            let tableHTML = "<table><thead><tr>";
+
+            // En-têtes des colonnes pour les variables
+            variables.forEach(variable => {
+                tableHTML += `<th>${variable}</th>`;
+            });
+
+            tableHTML += "<th>Sortie</th></tr></thead><tbody>";
+
+            // Remplir le tableau avec toutes les combinaisons possibles
+            for (let i = 0; i < numRows; i++) {
+                const rowData = [];
+                for (let j = 0; j < numVariables; j++) {
+                    rowData.push((i & (1 << j)) ? "1" : "0");
+                }
+                console.log(rowData);
+                const outputValue = evaluateExpression(rowData);
+                tableHTML += "<tr>" + rowData.map(value => `<td>${value}</td>`).join('') + `<td>${outputValue}</td></tr>`;
+            }
+
+            tableHTML += "</tbody></table>";
+            tableDiv.innerHTML = tableHTML;
+        }
+
+        // Évaluer l'expression logique en fonction des valeurs des variables
+        // Fonction pour construire l'expression logique à partir d'un composant donné
+function buildExpression(element) {
+    const connections = jsPlumbInstance.getConnections({ target: element });
+
+    // Si l'élément est une variable d'entrée, retourner son nom directement
+    if (element.classList.contains("variable")) {
+        return element.innerText.trim();
+    }
+
+    // Récupérer les expressions pour les connexions entrantes
+    const expressions = connections.map(connection => {
+        const sourceElement = connection.source;
+        return buildExpression(sourceElement);
+    });
+
+    // Construire l'expression en fonction du type de composant (AND ou OR)
+    if (element.innerText === "AND") {
+        return `(${expressions.join(" . ")})`;
+    } else if (element.innerText === "OR") {
+        return `(${expressions.join(" + ")})`;
+    }
+    return "";
+}
+
+// Mettre à jour la formule dans le bloc de sortie
+function updateFormula() {
+    if (output) {
+        output.innerText = "Sortie: " + buildExpression(output);
+    }
+}
+
+// Évaluer l'expression logique en fonction des valeurs des variables
+function evaluateExpression(values) {
+    function evaluate(element) {
+        const connections = jsPlumbInstance.getConnections({ target: element });
+
+        // Si c'est une variable, retourne sa valeur
+        if (element.classList.contains("variable")) {
+            const index = variables.indexOf(element.innerText.trim());
+            return values[index] === "1";
+        }
+
+        // Récupérer les valeurs pour les connexions entrantes
+        const inputValues = connections.map(connection => evaluate(connection.source));
+
+        // Appliquer l'opération logique en fonction du type de composant
+        if (element.innerText === "AND") {
+            return inputValues.every(Boolean);
+        } else if (element.innerText === "OR") {
+            return inputValues.some(Boolean);
+        }
+        return false;
+    }
+
+    return evaluate(output) ? "1" : "0";
+}
+
+    </script>
+</body>
+</html>
