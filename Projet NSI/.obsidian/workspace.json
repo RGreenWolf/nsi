@@ -1,0 +1,171 @@
+{
+  "main": {
+    "id": "fb8134f737d5c10d",
+    "type": "split",
+    "children": [
+      {
+        "id": "204a8f650e20e560",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "67c18456f61abbd4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projet NSI 1GEN.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Projet NSI 1GEN"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "cf40c3210f52dc5e",
+    "type": "split",
+    "children": [
+      {
+        "id": "e967124f19204a1a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d2c52a7e4bb03683",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorateur de fichiers"
+            }
+          },
+          {
+            "id": "21c3c79be4d4e33f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Rechercher"
+            }
+          },
+          {
+            "id": "f5451fb588974694",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Signet"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "3ff934b59c9ac623",
+    "type": "split",
+    "children": [
+      {
+        "id": "db93fa0960d31803",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "258336eb065eeabd",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Projet NSI 1GEN.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Rétrolien pour Projet NSI 1GEN"
+            }
+          },
+          {
+            "id": "771784723fb17761",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Projet NSI 1GEN.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Liens sortants de Projet NSI 1GEN"
+            }
+          },
+          {
+            "id": "643017735d8efb39",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Mots-clés"
+            }
+          },
+          {
+            "id": "680bfd9ae14e3c50",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Projet NSI 1GEN.md"
+              },
+              "icon": "lucide-list",
+              "title": "Plan de Projet NSI 1GEN"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Ouvrir le sélecteur rapide": false,
+      "graph:Ouvrir la vue graphique": false,
+      "canvas:Créer une nouvelle toile": false,
+      "daily-notes:Ouvrir la note quotidienne": false,
+      "templates:Insérer le modèle": false,
+      "command-palette:Ouvrir la palette de commandes": false
+    }
+  },
+  "active": "67c18456f61abbd4",
+  "lastOpenFiles": [
+    "2024-11-22.md",
+    "Projet NSI 1GEN.md",
+    "créez un lien.md"
+  ]
+}
