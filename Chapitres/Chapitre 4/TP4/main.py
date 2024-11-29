@@ -25,6 +25,14 @@ for c in chaine:
         print("e est dans la chaine")
         break
 
+i = 0
+stop = False
+while i < len(chaine) and not stop:
+    if chaine[i] == "e":
+        print("e est dans la chaine")
+        stop = True
+    i += 1
+
 # Exercice 3
 
 print("\nExercice 3")
@@ -60,3 +68,5 @@ if chaine == chaine[::-1]:
     print(f"La chaîne '{chaine}' est un palindrome.")
 else:
     print(f"La chaîne '{chaine}' n'est pas un palindrome.")
+
+def IsPalindrome(chaine: str) -> bool: return chaine == chaine[::-1] # fonctions en une ligne
