@@ -68,5 +68,4 @@ if chaine == chaine[::-1]:
     print(f"La chaîne '{chaine}' est un palindrome.")
 else:
     print(f"La chaîne '{chaine}' n'est pas un palindrome.")
-
 def IsPalindrome(chaine: str) -> bool: return chaine == chaine[::-1] # fonctions en une ligne
