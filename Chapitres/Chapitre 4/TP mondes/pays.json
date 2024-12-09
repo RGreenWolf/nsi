@@ -1,0 +1,725 @@
+[
+    {
+        "nom": "France",
+        "capitale": "Paris",
+        "villes": [
+            {
+                "nom": "Paris",
+                "region": "Île-de-France",
+                "population": 2140526,
+                "coordonnees": {
+                    "latitude": 48.8566,
+                    "longitude": 2.3522
+                }
+            },
+            {
+                "nom": "Dunkerque",
+                "region": "Hauts-de-France",
+                "population": 89165,
+                "coordonnees": {
+                    "latitude": 51.0343,
+                    "longitude": 2.3768
+                }
+            },
+            {
+                "nom": "Marseille",
+                "region": "Provence-Alpes-Côte d'Azur",
+                "population": 850726,
+                "coordonnees": {
+                    "latitude": 43.2965,
+                    "longitude": 5.3698
+                }
+            },
+            {
+                "nom": "Lyon",
+                "region": "Auvergne-Rhône-Alpes",
+                "population": 513275,
+                "coordonnees": {
+                    "latitude": 45.764,
+                    "longitude": 4.8357
+                }
+            },
+            {
+                "nom": "Toulouse",
+                "region": "Occitanie",
+                "population": 479553,
+                "coordonnees": {
+                    "latitude": 43.6047,
+                    "longitude": 1.4442
+                }
+            },
+            {
+                "nom": "Nice",
+                "region": "Provence-Alpes-Côte d'Azur",
+                "population": 342295,
+                "coordonnees": {
+                    "latitude": 43.7102,
+                    "longitude": 7.262
+                }
+            },
+            {
+                "nom": "Nantes",
+                "region": "Pays de la Loire",
+                "population": 306694,
+                "coordonnees": {
+                    "latitude": 47.2184,
+                    "longitude": -1.5536
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Belgique",
+        "capitale": "Bruxelles",
+        "villes": [
+            {
+                "nom": "Bruxelles",
+                "region": "Bruxelles-Capitale",
+                "population": 185103,
+                "coordonnees": {
+                    "latitude": 50.8503,
+                    "longitude": 4.3517
+                }
+            },
+            {
+                "nom": "Anvers",
+                "region": "Flandre",
+                "population": 525935,
+                "coordonnees": {
+                    "latitude": 51.2194,
+                    "longitude": 4.4025
+                }
+            },
+            {
+                "nom": "Gand",
+                "region": "Flandre",
+                "population": 262219,
+                "coordonnees": {
+                    "latitude": 51.0543,
+                    "longitude": 3.7174
+                }
+            }
+        ]
+    },
+    {
+        "nom": "États-Unis",
+        "capitale": "Washington, D.C.",
+        "villes": [
+            {
+                "nom": "New York",
+                "region": "New York",
+                "population": 8419600,
+                "coordonnees": {
+                    "latitude": 40.7128,
+                    "longitude": -74.006
+                }
+            },
+            {
+                "nom": "Los Angeles",
+                "region": "Californie",
+                "population": 3980400,
+                "coordonnees": {
+                    "latitude": 34.0522,
+                    "longitude": -118.2437
+                }
+            },
+            {
+                "nom": "Chicago",
+                "region": "Illinois",
+                "population": 2716000,
+                "coordonnees": {
+                    "latitude": 41.8781,
+                    "longitude": -87.6298
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Japon",
+        "capitale": "Tokyo",
+        "villes": [
+            {
+                "nom": "Tokyo",
+                "region": "Kantō",
+                "population": 13929286,
+                "coordonnees": {
+                    "latitude": 35.6895,
+                    "longitude": 139.6917
+                }
+            },
+            {
+                "nom": "Osaka",
+                "region": "Kansai",
+                "population": 8839469,
+                "coordonnees": {
+                    "latitude": 34.6937,
+                    "longitude": 135.5023
+                }
+            },
+            {
+                "nom": "Nagoya",
+                "region": "Chūbu",
+                "population": 2295000,
+                "coordonnees": {
+                    "latitude": 35.1815,
+                    "longitude": 136.9066
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Inde",
+        "capitale": "New Delhi",
+        "villes": [
+            {
+                "nom": "Mumbai",
+                "region": "Maharashtra",
+                "population": 12478447,
+                "coordonnees": {
+                    "latitude": 19.076,
+                    "longitude": 72.8777
+                }
+            },
+            {
+                "nom": "Delhi",
+                "region": "Delhi",
+                "population": 11007835,
+                "coordonnees": {
+                    "latitude": 28.6139,
+                    "longitude": 77.209
+                }
+            },
+            {
+                "nom": "Bangalore",
+                "region": "Karnataka",
+                "population": 8443675,
+                "coordonnees": {
+                    "latitude": 12.9716,
+                    "longitude": 77.5946
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Brésil",
+        "capitale": "Brasilia",
+        "villes": [
+            {
+                "nom": "Sao Paulo",
+                "region": "Sao Paulo",
+                "population": 12325232,
+                "coordonnees": {
+                    "latitude": -23.5505,
+                    "longitude": -46.6333
+                }
+            },
+            {
+                "nom": "Rio de Janeiro",
+                "region": "Rio de Janeiro",
+                "population": 6748000,
+                "coordonnees": {
+                    "latitude": -22.9068,
+                    "longitude": -43.1729
+                }
+            },
+            {
+                "nom": "Brasília",
+                "region": "Distrito Federal",
+                "population": 3055149,
+                "coordonnees": {
+                    "latitude": -15.8267,
+                    "longitude": -47.9218
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Allemagne",
+        "capitale": "Berlin",
+        "villes": [
+            {
+                "nom": "Berlin",
+                "region": "Berlin",
+                "population": 3769000,
+                "coordonnees": {
+                    "latitude": 52.52,
+                    "longitude": 13.405
+                }
+            },
+            {
+                "nom": "Munich",
+                "region": "Bavière",
+                "population": 1472000,
+                "coordonnees": {
+                    "latitude": 48.1351,
+                    "longitude": 11.582
+                }
+            },
+            {
+                "nom": "Hambourg",
+                "region": "Hambourg",
+                "population": 1841000,
+                "coordonnees": {
+                    "latitude": 53.5511,
+                    "longitude": 9.9937
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Australie",
+        "capitale": "Canberra",
+        "villes": [
+            {
+                "nom": "Sydney",
+                "region": "Nouvelle-Galles du Sud",
+                "population": 5312163,
+                "coordonnees": {
+                    "latitude": -33.8688,
+                    "longitude": 151.2093
+                }
+            },
+            {
+                "nom": "Melbourne",
+                "region": "Victoria",
+                "population": 5078193,
+                "coordonnees": {
+                    "latitude": -37.8136,
+                    "longitude": 144.9631
+                }
+            },
+            {
+                "nom": "Brisbane",
+                "region": "Queensland",
+                "population": 2514184,
+                "coordonnees": {
+                    "latitude": -27.4698,
+                    "longitude": 153.0251
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Canada",
+        "capitale": "Ottawa",
+        "villes": [
+            {
+                "nom": "Toronto",
+                "region": "Ontario",
+                "population": 2930000,
+                "coordonnees": {
+                    "latitude": 43.6511,
+                    "longitude": -79.347
+                }
+            },
+            {
+                "nom": "Montréal",
+                "region": "Québec",
+                "population": 1780000,
+                "coordonnees": {
+                    "latitude": 45.5017,
+                    "longitude": -73.5673
+                }
+            },
+            {
+                "nom": "Vancouver",
+                "region": "Colombie-Britannique",
+                "population": 675218,
+                "coordonnees": {
+                    "latitude": 49.2827,
+                    "longitude": -123.1207
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Royaume-Uni",
+        "capitale": "Londres",
+        "villes": [
+            {
+                "nom": "Londres",
+                "region": "Grand Londres",
+                "population": 8787892,
+                "coordonnees": {
+                    "latitude": 51.5074,
+                    "longitude": -0.1278
+                }
+            },
+            {
+                "nom": "Manchester",
+                "region": "Grand Manchester",
+                "population": 547627,
+                "coordonnees": {
+                    "latitude": 53.4808,
+                    "longitude": -2.2426
+                }
+            },
+            {
+                "nom": "Birmingham",
+                "region": "West Midlands",
+                "population": 1137100,
+                "coordonnees": {
+                    "latitude": 52.4862,
+                    "longitude": -1.8904
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Russie",
+        "capitale": "Moscou",
+        "villes": [
+            {
+                "nom": "Moscou",
+                "region": "Moscou",
+                "population": 11979529,
+                "coordonnees": {
+                    "latitude": 55.7558,
+                    "longitude": 37.6176
+                }
+            },
+            {
+                "nom": "Saint-Pétersbourg",
+                "region": "Saint-Pétersbourg",
+                "population": 5392992,
+                "coordonnees": {
+                    "latitude": 59.9343,
+                    "longitude": 30.3351
+                }
+            },
+            {
+                "nom": "Novossibirsk",
+                "region": "Novossibirsk",
+                "population": 1612833,
+                "coordonnees": {
+                    "latitude": 55.0084,
+                    "longitude": 82.9357
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Chine",
+        "capitale": "Pékin",
+        "villes": [
+            {
+                "nom": "Shanghai",
+                "region": "Shanghai",
+                "population": 24256800,
+                "coordonnees": {
+                    "latitude": 31.2304,
+                    "longitude": 121.4737
+                }
+            },
+            {
+                "nom": "Pékin",
+                "region": "Pékin",
+                "population": 21516000,
+                "coordonnees": {
+                    "latitude": 39.9042,
+                    "longitude": 116.4074
+                }
+            },
+            {
+                "nom": "Shenzhen",
+                "region": "Guangdong",
+                "population": 10025902,
+                "coordonnees": {
+                    "latitude": 22.5431,
+                    "longitude": 114.0579
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Corée du Sud",
+        "capitale": "Séoul",
+        "villes": [
+            {
+                "nom": "Séoul",
+                "region": "Séoul",
+                "population": 9720846,
+                "coordonnees": {
+                    "latitude": 37.5665,
+                    "longitude": 126.978
+                }
+            },
+            {
+                "nom": "Busan",
+                "region": "Busan",
+                "population": 3413841,
+                "coordonnees": {
+                    "latitude": 35.1796,
+                    "longitude": 129.0756
+                }
+            },
+            {
+                "nom": "Incheon",
+                "region": "Incheon",
+                "population": 2938429,
+                "coordonnees": {
+                    "latitude": 37.4563,
+                    "longitude": 126.7052
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Afrique du Sud",
+        "capitale": "Pretoria",
+        "villes": [
+            {
+                "nom": "Johannesburg",
+                "region": "Gauteng",
+                "population": 4434827,
+                "coordonnees": {
+                    "latitude": -26.2041,
+                    "longitude": 28.0473
+                }
+            },
+            {
+                "nom": "Le Cap",
+                "region": "Cap-Occidental",
+                "population": 3740026,
+                "coordonnees": {
+                    "latitude": -33.9249,
+                    "longitude": 18.4241
+                }
+            },
+            {
+                "nom": "Durban",
+                "region": "KwaZulu-Natal",
+                "population": 3442361,
+                "coordonnees": {
+                    "latitude": -29.8587,
+                    "longitude": 31.0218
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Mexique",
+        "capitale": "Mexico",
+        "villes": [
+            {
+                "nom": "Mexico",
+                "region": "Mexico",
+                "population": 8851080,
+                "coordonnees": {
+                    "latitude": 19.4326,
+                    "longitude": -99.1332
+                }
+            },
+            {
+                "nom": "Guadalajara",
+                "region": "Jalisco",
+                "population": 1460148,
+                "coordonnees": {
+                    "latitude": 20.6597,
+                    "longitude": -103.3496
+                }
+            },
+            {
+                "nom": "Monterrey",
+                "region": "Nuevo León",
+                "population": 1135508,
+                "coordonnees": {
+                    "latitude": 25.6866,
+                    "longitude": -100.3161
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Argentine",
+        "capitale": "Buenos Aires",
+        "villes": [
+            {
+                "nom": "Buenos Aires",
+                "region": "Buenos Aires",
+                "population": 2890151,
+                "coordonnees": {
+                    "latitude": -34.6037,
+                    "longitude": -58.3816
+                }
+            },
+            {
+                "nom": "Córdoba",
+                "region": "Córdoba",
+                "population": 1335886,
+                "coordonnees": {
+                    "latitude": -31.4201,
+                    "longitude": -64.1888
+                }
+            },
+            {
+                "nom": "Rosario",
+                "region": "Santa Fe",
+                "population": 1193607,
+                "coordonnees": {
+                    "latitude": -32.9421,
+                    "longitude": -60.6393
+                }
+            },
+            {
+                "nom": "Mendoza",
+                "region": "Mendoza",
+                "population": 1150411,
+                "coordonnees": {
+                    "latitude": -32.8895,
+                    "longitude": -68.8458
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Italie",
+        "capitale": "Rome",
+        "villes": [
+            {
+                "nom": "Rome",
+                "region": "Latium",
+                "population": 2872800,
+                "coordonnees": {
+                    "latitude": 41.9028,
+                    "longitude": 12.4964
+                }
+            },
+            {
+                "nom": "Milan",
+                "region": "Lombardie",
+                "population": 1366180,
+                "coordonnees": {
+                    "latitude": 45.4642,
+                    "longitude": 9.190
+                }
+            },
+            {
+                "nom": "Naples",
+                "region": "Campanie",
+                "population": 962003,
+                "coordonnees": {
+                    "latitude": 40.8518,
+                    "longitude": 14.2681
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Espagne",
+        "capitale": "Madrid",
+        "villes": [
+            {
+                "nom": "Madrid",
+                "region": "Communauté de Madrid",
+                "population": 3223334,
+                "coordonnees": {
+                    "latitude": 40.4168,
+                    "longitude": -3.7038
+                }
+            },
+            {
+                "nom": "Barcelone",
+                "region": "Catalogne",
+                "population": 1620343,
+                "coordonnees": {
+                    "latitude": 41.3851,
+                    "longitude": 2.1734
+                }
+            },
+            {
+                "nom": "Valence",
+                "region": "Communauté valencienne",
+                "population": 790201,
+                "coordonnees": {
+                    "latitude": 39.4699,
+                    "longitude": -0.3763
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Portugal",
+        "capitale": "Lisbonne",
+        "villes": [
+            {
+                "nom": "Lisbonne",
+                "region": "Lisbonne",
+                "population": 506654,
+                "coordonnees": {
+                    "latitude": 38.7223,
+                    "longitude": -9.1393
+                }
+            },
+            {
+                "nom": "Porto",
+                "region": "Porto",
+                "population": 237591,
+                "coordonnees": {
+                    "latitude": 41.1579,
+                    "longitude": -8.6291
+                }
+            },
+            {
+                "nom": "Vila Nova de Gaia",
+                "region": "Porto",
+                "population": 178255,
+                "coordonnees": {
+                    "latitude": 41.1339,
+                    "longitude": -8.6173
+                }
+            },
+            {
+                "nom": "Amadora",
+                "region": "Lisbonne",
+                "population": 175136,
+                "coordonnees": {
+                    "latitude": 38.7538,
+                    "longitude": -9.2302
+                }
+            }
+        ]
+    },
+    {
+        "nom": "Pays-Bas",
+        "capitale": "Amsterdam",
+        "villes": [
+            {
+                "nom": "Amsterdam",
+                "region": "Hollande-Septentrionale",
+                "population": 821752,
+                "coordonnees": {
+                    "latitude": 52.3676,
+                    "longitude": 4.9041
+                }
+            },
+            {
+                "nom": "Rotterdam",
+                "region": "Hollande-Méridionale",
+                "population": 633471,
+                "coordonnees": {
+                    "latitude": 51.9244,
+                    "longitude": 4.4777
+                }
+            },
+            {
+                "nom": "La Haye",
+                "region": "Hollande-Méridionale",
+                "population": 514861,
+                "coordonnees": {
+                    "latitude": 52.0705,
+                    "longitude": 4.3007
+                }
+            },
+            {
+                "nom": "Utrecht",
+                "region": "Utrecht",
+                "population": 334176,
+                "coordonnees": {
+                    "latitude": 52.0907,
+                    "longitude": 5.1214
+                }
+            }
+        ]
+    }
+]
