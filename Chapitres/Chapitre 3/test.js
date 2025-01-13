@@ -18,4 +18,4 @@ function generateTruthTable(expression) {
     console.table(truthTable);
 }
 
-generateTruthTable("(A+B).(C.D).(E+F).(G+H).(I+J).(K+L).(M+N).(O+P)");
+generateTruthTable("(A+B).C");
