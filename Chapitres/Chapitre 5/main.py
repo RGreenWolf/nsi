@@ -85,25 +85,40 @@ def save(fichier: str, data: dict) -> None:
             file.write(";".join(values) + "\n")
 
 def afficher_monde():
-    x=[]
-    y=[]
-    
+    x = []
+    y = []
+    names = []
+
     for citie in cities.values():
         x.append(float(citie['longitude']))
         y.append(numpy.arcsinh(numpy.tan(float(citie['latitude']) * numpy.pi / 180)))
+        names.append(citie['name'])
+    
     plt.scatter(x, y)
+    
+    for i, name in enumerate(names):
+        plt.annotate(name, (x[i], y[i]), fontsize=8, alpha=0.75)
+    
     plt.show()
 
-def afficher_carte():
-    x=[]
-    y=[]
-    colors=[]
-    
+def afficher_carte(pays: str):
+    x = []
+    y = []
+    colors = []
+    names = []
+
     for citie in cities.values():
-        x.append(float(citie['longitude']))
-        y.append(numpy.arcsinh(numpy.tan(float(citie['latitude']) * numpy.pi / 180)))
-        colors.append(int(citie['population']) / 10000)
+        if citie['country_iso'] == pays:
+            x.append(float(citie['longitude']))
+            y.append(numpy.arcsinh(numpy.tan(float(citie['latitude']) * numpy.pi / 180)))
+            colors.append(int(citie['population']) / 10000)
+            names.append(citie['name'])
+    
     plt.scatter(x, y, s=colors)
+    
+    for i, name in enumerate(names):
+        plt.annotate(name, (x[i], y[i]), fontsize=8, alpha=0.75)
+    
     plt.show()
 
 afficher_monde()
