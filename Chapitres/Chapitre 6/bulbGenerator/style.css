@@ -1,0 +1,31 @@
+html {
+    font-family: Arial, sans-serif;
+    background-color: rgb(2, 0, 54);
+}
+
+button {
+    background-color: orange;
+    border-radius: 10px;
+    font-size: larger;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background-color: darkorange;
+}
+
+button:active {
+    background-color: rgb(60, 232, 8);
+}
+
+img {
+    width: 150px;
+    height: auto;
+    justify-content: center;
+    display: flex;
+}
