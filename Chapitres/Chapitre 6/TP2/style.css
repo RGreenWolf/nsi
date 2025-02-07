@@ -1,0 +1,36 @@
+@font-face {
+  font-family: retro_gaming;
+  src: url(retro_gaming_font.ttf);
+}
+
+* {
+  text-align: center;
+  font-family: retro_gaming;
+}
+
+html,
+body {
+  height: 98%;
+}
+
+table {
+  width: 100%;
+  height: 65%;
+}
+
+button {
+  width: 80px;
+  height: 80px;
+}
+
+.wrong {
+  
+}
+
+.wrong:hover {
+  
+}
+
+.right {
+  
+}
