@@ -13,6 +13,16 @@ body {
   height: 98%;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+}
+
+h1, h2, h3 {
+  color: #333;
+}
+
 table {
   width: 100%;
   height: 65%;
@@ -21,16 +31,53 @@ table {
 button {
   width: 80px;
   height: 80px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#gameTable {
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+#gameTable td {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.tableElement {
+  background-color: #fff;
+}
+
+.tableElement:hover {
+  background-color: #00FFFF;
 }
 
 .wrong {
-  
+  background-color: #ffcccc;
 }
 
 .wrong:hover {
-  
+
 }
 
-.right {
-  
+.hidden {
+  display: none;
+}
+
+#winScreen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 2px solid black;
+  text-align: center;
+  z-index: 1000;
 }

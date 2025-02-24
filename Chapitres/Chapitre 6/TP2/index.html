@@ -8,10 +8,14 @@
   <body>
     <h1>TP Nombre Mystère v2.0</h1>
     <h2>GAME</h2>
-    <button onclick="play()">PLAY !</button>
+    <button id="playButton" onclick="play()">START</button>
     <br>
-    <h3>Nombre d'essais : <span id="nbEssais">0</span></h3>
-    <table id="tableau"></table>
+    <h3>Nombre d'essais : <span id="tries">0</span></h3>
+    <table id="gameTable"></table>
+    <div id="winScreen" class="hidden" style="text-align: center;">
+      <h2>Vous avez gagné !</h2>
+      <p>Le nombre mystère était : <span id="winNumber"></span></p>
+    </div>
   </body>
   <script type="text/javascript" src="script.js"></script>
 </html>
